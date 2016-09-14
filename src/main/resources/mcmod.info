@@ -1,0 +1,16 @@
+[
+{
+  "modid": "handheldnavalgun",
+  "name": "HandheldNavalGun",
+  "description": "Adds a Hand-held Naval Gun.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "https://github.com/Iunius118",
+  "updateUrl": "",
+  "authorList": ["Iunius"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
