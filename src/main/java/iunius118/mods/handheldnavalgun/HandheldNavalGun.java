@@ -89,22 +89,24 @@ public class HandheldNavalGun {
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent
 	public void onRenderWorldLastEvent(RenderWorldLastEvent event) {
-		vec3Target = null;
-		vec3Marker = null;
-		ticksFuse = EntityProjectile127mmAntiAircraftCommon.FUSE_MAX;
+		this.vec3Target = null;
+		this.vec3Marker = null;
+		this.ticksFuse = EntityProjectile127mmAntiAircraftCommon.FUSE_MAX;
 
 		if (Minecraft.getMinecraft().getRenderManager().options != null && Minecraft.getMinecraft().getRenderManager().options.thirdPersonView > 0) {
 			return;
 		}
 
-		if (target != null) {
-			Vec3d pos = target.getPos(Minecraft.getMinecraft().theWorld, event.getPartialTicks());
+		if (this.target != null) {
+			Vec3d pos = this.target.getPos(Minecraft.getMinecraft().theWorld, event.getPartialTicks());
 
 			if (pos != null) {
-				vec3Target = ClientUtils.getScreenPos(pos, event.getPartialTicks());
-				vec3Marker = ClientUtils.getTargetFutureScreenPos(Minecraft.getMinecraft().theWorld, target, event.getPartialTicks());
+				int fuseMax = EntityProjectile127mmAntiAircraftCommon.FUSE_MAX;
+				double initialVelocity = EntityProjectile127mmAntiAircraftCommon.INITIAL_VELOCITY;
+				this.vec3Target = ClientUtils.getScreenPos(pos, event.getPartialTicks());
+				this.vec3Marker = ClientUtils.getTargetFutureScreenPos(Minecraft.getMinecraft().theWorld, this.target, fuseMax, initialVelocity, event.getPartialTicks());
 			} else {
-				target = null;
+				this.target = null;
 			}
 		}
 	}
@@ -122,13 +124,12 @@ public class HandheldNavalGun {
 			GlStateManager.disableDepth();
 			GlStateManager.enableBlend();
 			GlStateManager.disableTexture2D();
-			GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
 			GlStateManager.color(0.0F, 1.0F, 0.0F, 1.0F);
 			GlStateManager.glLineWidth(1.0F);
 
 			if (vec3Target != null) {
-				double x = vec3Target.xCoord;
-				double y = vec3Target.yCoord;
+				double x = this.vec3Target.xCoord;
+				double y = this.vec3Target.yCoord;
 				vertexbuffer.begin(GL11.GL_LINE_LOOP, DefaultVertexFormats.POSITION);
 				vertexbuffer.pos(x - markerSize, y - markerSize, 0.0D).endVertex();
 				vertexbuffer.pos(x + markerSize, y - markerSize, 0.0D).endVertex();
@@ -138,8 +139,8 @@ public class HandheldNavalGun {
 			}
 
 			if (vec3Marker != null) {
-				double x = vec3Marker.xCoord;
-				double y = vec3Marker.yCoord;
+				double x = this.vec3Marker.xCoord;
+				double y = this.vec3Marker.yCoord;
 				vertexbuffer.begin(GL11.GL_LINE_LOOP, DefaultVertexFormats.POSITION);
 				vertexbuffer.pos(x, y - markerSize, 0.0D).endVertex();
 				vertexbuffer.pos(x + markerSize, y, 0.0D).endVertex();

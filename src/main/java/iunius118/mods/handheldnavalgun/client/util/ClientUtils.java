@@ -2,7 +2,6 @@ package iunius118.mods.handheldnavalgun.client.util;
 
 import iunius118.mods.handheldnavalgun.HandheldNavalGun;
 import iunius118.mods.handheldnavalgun.client.Target;
-import iunius118.mods.handheldnavalgun.entity.EntityProjectile127mmAntiAircraftCommon;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -33,10 +32,10 @@ public class ClientUtils {
 	private static double[] v0rate;
 
 	public ClientUtils() {
-		v0rate = new double[EntityProjectile127mmAntiAircraftCommon.FUSE_MAX + 1];
+		this.v0rate = new double[128];
 
-		for (int i = 0; i < v0rate.length; i++){
-			v0rate[i] = 100 * (1 - Math.exp(-0.01 * i));
+		for (int i = 0; i < this.v0rate.length; i++){
+			this.v0rate[i] = 100 * (1 - Math.exp(-0.01 * i));
 		}
 	}
 
@@ -56,54 +55,75 @@ public class ClientUtils {
 		return d;
 	}
 
-	public static Vec3d getTargetFutureScreenPos(World world, Target target, float partialTicks) {
-		Entity player = Minecraft.getMinecraft().getRenderViewEntity();
-		Vec3d vec3Player = new Vec3d(player.posX, player.posY + player.getEyeHeight(), player.posZ);
-		final int limit = EntityProjectile127mmAntiAircraftCommon.FUSE_MAX;
-		final double v0sq = EntityProjectile127mmAntiAircraftCommon.INITIAL_VELOCITY * EntityProjectile127mmAntiAircraftCommon.INITIAL_VELOCITY;
+	public static Vec3d getTargetFutureScreenPos(World world, Target target, int fuseMax, double initialVelocity, float partialTicks) {
+		Entity player = Minecraft.getMinecraft().thePlayer;
+		double px = player.lastTickPosX + (player.posX - player.lastTickPosX) * partialTicks;
+		double py = player.lastTickPosY + (player.posY - player.lastTickPosY) * partialTicks + player.getEyeHeight();
+		double pz = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * partialTicks;
+		Vec3d vec3Player = new Vec3d(px, py, pz);
+		final double v0sq = initialVelocity * initialVelocity;
+		Vec3d vec3Target1 = target.getPos(world, partialTicks + 1.0F);
+		Vec3d vec3DeltaTarget = target.getDeltaPos(world);
 
-		for (int t = 1; t < limit; t++) {
-			Vec3d vec3Target = target.getPos(world, partialTicks + t);
-			double r = vec3Player.distanceTo(vec3Target);
-			int ts = (int)Math.floor(0.00007D * r * r + 0.25 * r - 0.04D);
+		if (vec3Target1 == null || vec3DeltaTarget == null) {
+			return null;
+		}
 
-			if (ts > t) {
-				continue;
+		int t;
+
+		for (t = 1; t < fuseMax; t++) {
+			double r = vec3Player.distanceTo(vec3Target1);
+			int ts = (int)Math.floor(0.00007D * r * r + 0.25D * r - 0.04D);
+
+			if (ts <= t) {
+				break;
 			}
 
-			double x1 = vec3Target.xCoord - vec3Player.xCoord;
-			double z1 = vec3Target.zCoord - vec3Player.zCoord;
-			double tx1 = Math.sqrt(x1 * x1 + z1 * z1);
-			double ty1 = vec3Target.yCoord - vec3Player.yCoord;
-			double v0x1 = tx1 / ticksToV0Rate(ts);
-			double v0y1 = (ty1 + 3 * ts) / ticksToV0Rate(ts) - 3;
-			double v0sq1 = v0x1 * v0x1 + v0y1 * v0y1;
+			vec3Target1 = vec3Target1.add(vec3DeltaTarget);
+		}
 
-			double x2 = vec3Target.xCoord - vec3Player.xCoord;
-			double z2 = vec3Target.zCoord - vec3Player.zCoord;
+		double x1 = vec3Target1.xCoord - vec3Player.xCoord;
+		double z1 = vec3Target1.zCoord - vec3Player.zCoord;
+		double tx1 = Math.sqrt(x1 * x1 + z1 * z1);
+		double ty1 = vec3Target1.yCoord - vec3Player.yCoord;
+		double v0x1 = tx1 / ticksToV0Rate(t);
+		double v0y1 = (ty1 + 3.0D * t) / ticksToV0Rate(t) - 3.0D;
+		double v0sq1 = v0x1 * v0x1 + v0y1 * v0y1;
+
+		for (; t < fuseMax; t++) {
+			Vec3d vec3Target2 = vec3Target1.add(vec3DeltaTarget);
+			double x2 = vec3Target2.xCoord - vec3Player.xCoord;
+			double z2 = vec3Target2.zCoord - vec3Player.zCoord;
 			double tx2 = Math.sqrt(x2 * x2 + z2 * z2);
-			double ty2 = vec3Target.yCoord - vec3Player.yCoord;
+			double ty2 = vec3Target2.yCoord - vec3Player.yCoord;
 			double v0x2 = tx2 / ticksToV0Rate(t + 1);
-			double v0y2 = (ty2 + 3 * (t + 1)) / ticksToV0Rate(t + 1) - 3;
+			double v0y2 = (ty2 + 3.0D * (t + 1)) / ticksToV0Rate(t + 1) - 3.0D;
 			double v0sq2 = v0x2 * v0x2 + v0y2 * v0y2;
 
 			if ((v0sq1 > v0sq2 && v0sq1 >= v0sq && v0sq2 < v0sq) || (v0sq1 < v0sq2 && v0sq1 < v0sq && v0sq2 >= v0sq)) {
 				if (Math.abs(v0sq1 - v0sq) <= Math.abs(v0sq2 - v0sq)) {
 					HandheldNavalGun.INSTANCE.ticksFuse = t;
-					double theta = (tx1 != 0.0D) ? Math.toDegrees(Math.atan2(- vec3Target.xCoord + vec3Player.xCoord, vec3Target.zCoord - vec3Player.zCoord)) : 0.0D;
+					double theta = (tx1 != 0.0D) ? Math.toDegrees(Math.atan2(- vec3Target1.xCoord + vec3Player.xCoord, vec3Target1.zCoord - vec3Player.zCoord)) : 0.0D;
 					double a = -Math.toDegrees(Math.atan2(v0y1, v0x1));
 					return getScreenPos((float)theta, (float)a, partialTicks);
 				} else {
-					if (t < limit) {
+					if (t < fuseMax) {
 						t++;
 					}
 
 					HandheldNavalGun.INSTANCE.ticksFuse = t;
-					double theta = (tx2 != 0.0D) ? Math.toDegrees(Math.atan2(- vec3Target.xCoord + vec3Player.xCoord, vec3Target.zCoord - vec3Player.zCoord)) : 0.0D;
+					double theta = (tx2 != 0.0D) ? Math.toDegrees(Math.atan2(- vec3Target2.xCoord + vec3Player.xCoord, vec3Target2.zCoord - vec3Player.zCoord)) : 0.0D;
 					double a = -Math.toDegrees(Math.atan2(v0y2, v0x2));
 					return getScreenPos((float)theta, (float)a, partialTicks);
 				}
 			}
+
+			vec3Target1 = vec3Target2;
+			tx1 = tx2;
+			ty1 = ty2;
+			v0x1 = v0x2;
+			v0y1 = v0y2;
+			v0sq1 = v0sq2;
 		}
 
 		return null;

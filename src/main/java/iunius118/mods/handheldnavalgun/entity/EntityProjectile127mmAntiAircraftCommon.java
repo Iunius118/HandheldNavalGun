@@ -29,7 +29,7 @@ public class EntityProjectile127mmAntiAircraftCommon extends EntityThrowable {
 
 	public EntityProjectile127mmAntiAircraftCommon(World worldIn, EntityLivingBase throwerIn) {
 		super(worldIn, throwerIn);
-		setHeadingFromThrower(throwerIn, throwerIn.rotationPitch, throwerIn.rotationYaw, 0.0F, INITIAL_VELOCITY, INACCURACY);
+		this.setHeadingFromThrower(throwerIn, throwerIn.rotationPitch, throwerIn.rotationYaw, 0.0F, INITIAL_VELOCITY, INACCURACY);
 	}
 
 	public EntityProjectile127mmAntiAircraftCommon(World worldIn) {
@@ -85,7 +85,7 @@ public class EntityProjectile127mmAntiAircraftCommon extends EntityThrowable {
 		this.printDebugLog();
 
 		if (!this.isDead && (this.fuse < 1 || this.isInWater() || this.isInLava())) {
-			onImpact(new RayTraceResult(this));
+			this.onImpact(new RayTraceResult(this));
 		}
 
 		if (this.worldObj.isRemote) {

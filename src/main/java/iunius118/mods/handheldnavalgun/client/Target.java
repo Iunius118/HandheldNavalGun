@@ -18,7 +18,7 @@ public class Target {
 	}
 
 	public Target(World world, double x, double y, double z) {
-		setCoord(world, x, y, z);
+		this.setCoord(world, x, y, z);
 	}
 
 	public Target(World world, Vec3d v) {
@@ -52,17 +52,36 @@ public class Target {
 	}
 
 	public Vec3d getPos(World world, float partialTicks) {
-		if (worldHashCode != world.hashCode()) {
+		if (this.worldHashCode != world.hashCode()) {
 			return null;
-		} else if (type == Type.BLOCK) {
-			return pos;
-		} else if (type == Type.ENTITY) {
-			Entity entity = world.getEntityByID(entityId);
+		} else if (this.type == Type.BLOCK) {
+			return this.pos;
+		} else if (this.type == Type.ENTITY) {
+			Entity entity = world.getEntityByID(this.entityId);
 
 			if (entity != null && !entity.isDead) {
 				double x = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks;
 				double y = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks + entity.height / 2.0D;
 				double z = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks;
+				return new Vec3d(x, y, z);
+			}
+		}
+
+		return null;
+	}
+
+	public Vec3d getDeltaPos(World world) {
+		if (this.worldHashCode != world.hashCode()) {
+			return null;
+		} else if (this.type == Type.BLOCK) {
+			return new Vec3d(0.0D, 0.0D, 0.0D);
+		} else if (this.type == Type.ENTITY) {
+			Entity entity = world.getEntityByID(this.entityId);
+
+			if (entity != null && !entity.isDead) {
+				double x = entity.posX - entity.lastTickPosX;;
+				double y = entity.posY - entity.lastTickPosY;
+				double z = entity.posZ - entity.lastTickPosZ;
 				return new Vec3d(x, y, z);
 			}
 		}
