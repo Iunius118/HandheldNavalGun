@@ -71,7 +71,7 @@ public class ClientUtils {
 
 		int t;
 
-		for (t = 1; t < fuseMax; t++) {
+		for (t = 1; t <= fuseMax; t++) {
 			double r = vec3Player.distanceTo(vec3Target1);
 			int ts = (int)Math.floor(0.00007D * r * r + 0.25D * r - 0.04D);
 
@@ -90,7 +90,7 @@ public class ClientUtils {
 		double v0y1 = (ty1 + 3.0D * t) / ticksToV0Rate(t) - 3.0D;
 		double v0sq1 = v0x1 * v0x1 + v0y1 * v0y1;
 
-		for (; t < fuseMax; t++) {
+		for (; t <= fuseMax; t++) {
 			Vec3d vec3Target2 = vec3Target1.add(vec3DeltaTarget);
 			double x2 = vec3Target2.xCoord - vec3Player.xCoord;
 			double z2 = vec3Target2.zCoord - vec3Player.zCoord;
