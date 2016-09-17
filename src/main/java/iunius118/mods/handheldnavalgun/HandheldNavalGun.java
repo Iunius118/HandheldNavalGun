@@ -1,5 +1,6 @@
 package iunius118.mods.handheldnavalgun;
 
+import iunius118.mods.handheldnavalgun.client.RangeKeeperGun127mmType89;
 import iunius118.mods.handheldnavalgun.client.Target;
 import iunius118.mods.handheldnavalgun.client.util.ClientUtils;
 import iunius118.mods.handheldnavalgun.entity.EntityProjectile127mmAntiAircraftCommon;
@@ -101,10 +102,8 @@ public class HandheldNavalGun {
 			Vec3d pos = this.target.getPos(Minecraft.getMinecraft().theWorld, event.getPartialTicks());
 
 			if (pos != null) {
-				int fuseMax = EntityProjectile127mmAntiAircraftCommon.FUSE_MAX;
-				double initialVelocity = EntityProjectile127mmAntiAircraftCommon.INITIAL_VELOCITY;
 				this.vec3Target = ClientUtils.getScreenPos(pos, event.getPartialTicks());
-				this.vec3Marker = ClientUtils.getTargetFutureScreenPos(Minecraft.getMinecraft().theWorld, this.target, fuseMax, initialVelocity, event.getPartialTicks());
+				this.vec3Marker = RangeKeeperGun127mmType89.getTargetFutureScreenPos(Minecraft.getMinecraft().theWorld, this.target, event.getPartialTicks());
 			} else {
 				this.target = null;
 			}

@@ -29,7 +29,7 @@ public class EntityProjectile127mmAntiAircraftCommon extends EntityThrowable {
 
 	public EntityProjectile127mmAntiAircraftCommon(World worldIn, EntityLivingBase throwerIn) {
 		super(worldIn, throwerIn);
-		this.setHeadingFromThrower(throwerIn, throwerIn.rotationPitch, throwerIn.rotationYaw, 0.0F, INITIAL_VELOCITY, INACCURACY);
+		this.setHeadingFromThrower(throwerIn, throwerIn.rotationPitch, throwerIn.rotationYaw, 0.0F, this.INITIAL_VELOCITY, this.INACCURACY);
 	}
 
 	public EntityProjectile127mmAntiAircraftCommon(World worldIn) {
@@ -43,8 +43,8 @@ public class EntityProjectile127mmAntiAircraftCommon extends EntityThrowable {
 	public void setFuse(int ticks) {
 		if (ticks < 0) {
 			this.fuse = 0;
-		} else if (ticks > FUSE_MAX) {
-			this.fuse = FUSE_MAX;
+		} else if (ticks > this.FUSE_MAX) {
+			this.fuse = this.FUSE_MAX;
 		} else {
 			this.fuse = ticks;
 		}
@@ -103,7 +103,7 @@ public class EntityProjectile127mmAntiAircraftCommon extends EntityThrowable {
         	if (this.ticksExisted > 3) {
 	        	world.spawnParticle(EnumParticleTypes.EXPLOSION_HUGE, true, this.posX, this.posY, this.posZ, 1, 0.0D, 0.0D, 0.0D, 0.0D, new int[0]);
 	        	world.playSound(null, this.posX, this.posY, this.posZ, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.BLOCKS, 4.0F, (1.0F + (this.worldObj.rand.nextFloat() - this.worldObj.rand.nextFloat()) * 0.2F) * 0.7F);
-	        	world.createExplosion(this.getThrower(), this.posX, this.posY, this.posZ, STRENGTH, false);
+	        	world.createExplosion(this.getThrower(), this.posX, this.posY, this.posZ, this.STRENGTH, false);
         	} else {
         		if (result.typeOfHit == RayTraceResult.Type.ENTITY) {
         			if (result.entityHit instanceof EntityPlayer) {
