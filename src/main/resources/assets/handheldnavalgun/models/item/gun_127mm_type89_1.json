@@ -1,5 +1,5 @@
 {
-  "parent": "item/generated",
+  "parent": "item/handheld",
   "textures": {
     "layer0": "handheldnavalgun:items/gun_127mm_type89_1"
   }

@@ -17,7 +17,7 @@ public class EntityProjectile127mmAntiAircraftCommon extends EntityThrowable {
 
 	public static final int FUSE_MAX = 80;
 	public int fuse = FUSE_MAX;
-	public static final float STRENGTH = 6.0F;
+	public static final float STRENGTH = 4.0F;
 	public static final float INITIAL_VELOCITY = 4.0F;
 	public static final float INACCURACY = 0.5F;
 	public float spin = 0.0F;
@@ -107,9 +107,9 @@ public class EntityProjectile127mmAntiAircraftCommon extends EntityThrowable {
         	} else {
         		if (result.typeOfHit == RayTraceResult.Type.ENTITY) {
         			if (result.entityHit instanceof EntityPlayer) {
-        				result.entityHit.attackEntityFrom(DamageSource.causePlayerDamage((EntityPlayer)this.getThrower()), 20.0F);
+        				result.entityHit.attackEntityFrom(DamageSource.causePlayerDamage((EntityPlayer)this.getThrower()), 40.0F);
         			} else {
-        				result.entityHit.attackEntityFrom(DamageSource.causeMobDamage(this.getThrower()), 20.0F);
+        				result.entityHit.attackEntityFrom(DamageSource.causeMobDamage(this.getThrower()), 40.0F);
         			}
         		}
         	}
