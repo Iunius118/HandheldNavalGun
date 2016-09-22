@@ -1,6 +1,7 @@
 package iunius118.mods.handheldnavalgun.item;
 
 import iunius118.mods.handheldnavalgun.HandheldNavalGun;
+import iunius118.mods.handheldnavalgun.capability.CapabilityReloadTime;
 import iunius118.mods.handheldnavalgun.client.Target;
 import iunius118.mods.handheldnavalgun.client.util.ClientUtils;
 import iunius118.mods.handheldnavalgun.entity.EntityProjectile127mmAntiAircraftCommon;
@@ -24,8 +25,8 @@ import net.minecraft.world.WorldServer;
 
 public class ItemGun127mmType89Single extends Item {
 
-	public static final short RELOAD = 80;
-	public static final String TAG_RELOAD = "reload";
+	public static final String TAG_RELOAD_TIME = "reload";
+	public static final int RELOAD_TIME = 80;
 
 	public ItemGun127mmType89Single() {
 		super();
@@ -61,57 +62,82 @@ public class ItemGun127mmType89Single extends Item {
 
 	@Override
 	public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn, EnumHand hand) {
-			if (!worldIn.isRemote) {
-				if (itemStackIn.animationsToGo <= 0) {
-					WorldServer world = (WorldServer)worldIn;
+		NBTTagCompound nbt = itemStackIn.getTagCompound();
+		CapabilityReloadTime.IReloadTimeICapability cap = itemStackIn.getCapability(HandheldNavalGun.Capabilities.getReloadTimeICapability(), null);
 
-					EntityProjectile127mmAntiAircraftCommon entity = new EntityProjectile127mmAntiAircraftCommon(world, playerIn);
+		if (cap.getReloadTime() == 0 && nbt != null && nbt.getInteger(this.TAG_RELOAD_TIME) == 0) {
 
-					if (HandheldNavalGun.INSTANCE.vec3Marker != null) {
-						if (HandheldNavalGun.INSTANCE.ticksFuse > 3) {
-							entity.setFuse(HandheldNavalGun.INSTANCE.ticksFuse);
-						}
-					}
+			if (!worldIn.isRemote) {	// Server: Shot
+				WorldServer world = (WorldServer)worldIn;
 
-					playerIn.worldObj.spawnEntityInWorld(entity);
+				EntityProjectile127mmAntiAircraftCommon entity = new EntityProjectile127mmAntiAircraftCommon(world, playerIn);
 
-					Vec3d look = playerIn.getLook(1.0F).scale(2.0D);
-					double x = playerIn.posX + look.xCoord;
-					double y =playerIn.posY + playerIn.getEyeHeight() + look.yCoord;
-					double z =playerIn.posZ + look.zCoord;
-					world.spawnParticle(EnumParticleTypes.EXPLOSION_LARGE, x, y, z, 1, 0.0D, 0.0D, 0.0D, 0.0D, new int[0]);
-					world.playSound(null, x, y, z, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.BLOCKS, 0.5F, (1.0F + (world.rand.nextFloat() - world.rand.nextFloat()) * 0.2F) * 0.7F);
-
-					itemStackIn.animationsToGo = this.RELOAD;
-
-					if (itemStackIn.hasTagCompound()) {
-						itemStackIn.getTagCompound().setShort(this.TAG_RELOAD, this.RELOAD);
-					}
-
-					return new ActionResult(EnumActionResult.SUCCESS, itemStackIn);
-				}
-			} else {
-				if (itemStackIn.hasTagCompound()) {
-					if (itemStackIn.getTagCompound().getShort(this.TAG_RELOAD) <= 0) {
-						return new ActionResult(EnumActionResult.SUCCESS, itemStackIn);
+				if (HandheldNavalGun.INSTANCE.vec3Marker != null) {
+					if (HandheldNavalGun.INSTANCE.ticksFuse > 3) {
+						entity.setFuse(HandheldNavalGun.INSTANCE.ticksFuse);
 					}
 				}
+
+				playerIn.worldObj.spawnEntityInWorld(entity);
+
+				Vec3d look = playerIn.getLook(1.0F).scale(2.0D);
+				double x = playerIn.posX + look.xCoord;
+				double y =playerIn.posY + playerIn.getEyeHeight() + look.yCoord;
+				double z =playerIn.posZ + look.zCoord;
+				world.spawnParticle(EnumParticleTypes.EXPLOSION_LARGE, x, y, z, 1, 0.0D, 0.0D, 0.0D, 0.0D, new int[0]);
+				world.playSound(null, x, y, z, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.BLOCKS, 0.5F, (1.0F + (world.rand.nextFloat() - world.rand.nextFloat()) * 0.2F) * 0.7F);
+
+				cap.setReloadTime(this.RELOAD_TIME);
+				nbt.setInteger(this.TAG_RELOAD_TIME, this.RELOAD_TIME);	// Send to Client
+				// System.out.println("SHOT");
 			}
 
-			return new ActionResult(EnumActionResult.FAIL, itemStackIn);
+			return new ActionResult(EnumActionResult.SUCCESS, itemStackIn);
+		}
+
+		return new ActionResult(EnumActionResult.PASS, itemStackIn);
 	}
 
 	@Override
 	public void onUpdate(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
-		if (!stack.hasTagCompound()) {
+		NBTTagCompound nbt = stack.getTagCompound();
+		CapabilityReloadTime.IReloadTimeICapability cap = stack.getCapability(HandheldNavalGun.Capabilities.getReloadTimeICapability(), null);
+
+		cap.progress();	// Progress reload
+		// System.out.println((worldIn.isRemote ? "C " : "S ") + "CAP: " + cap.getReloadTime());
+
+		if (nbt != null) {
+			// System.out.println((worldIn.isRemote ? "C " : "S ") + "NBT: " + nbt.getInteger(this.TAG_RELOAD_TIME));
+
+			if (worldIn.isRemote) {
+				if (nbt.getInteger(this.TAG_RELOAD_TIME) == this.RELOAD_TIME) {	// Client: Shot in Server
+					nbt.setInteger(this.TAG_RELOAD_TIME, 0);
+					cap.setReloadTime(this.RELOAD_TIME);
+				}
+			} else {
+				if (cap.getReloadTime() <= 1) {	// Server: Complete reload
+					nbt.setInteger(this.TAG_RELOAD_TIME, 0);	// ...and send to Client
+				}
+			}
+		} else {
 			stack.setTagCompound(new NBTTagCompound());
 		}
 
-		if (!worldIn.isRemote) {
-			if (stack.animationsToGo <= 0) {
-				stack.getTagCompound().setShort(this.TAG_RELOAD, (short)0);
-			}
-		}
 	}
+
+	/*
+	 * Reload system
+	 * 	S(cap= 0, nbt= 0), C(cap= 0, nbt= 0) at onUpdate
+	 *  S(cap=80, nbt=80), C(cap= 0, nbt= 0) SHOT and update Server NBT and capability at onItemRightClick
+	 *   +1
+	 *  S(cap=80, nbt=80), C(cap= 0, nbt=80) sync NBT and renew Client ItemStack
+	 *  S(cap=79, nbt=80), C(cap= 0, nbt=80) progress reload time at onUpdate
+	 *  S(cap=79, nbt=80), C(cap=80, nbt= 0) update Client capability at onUpdate
+	 *   +78
+	 *  S(cap= 1, nbt=80), C(cap= 2, nbt= 0) at onUpdate
+	 *  S(cap= 1, nbt= 0), C(cap= 2, nbt= 0) update Server NBT at onUpdate
+	 *    +1
+	 *  S(cap= 0, nbt= 0), C(cap= 0 ,nbt= 0) sync NBT and renew Client ItemStack
+	 */
 
 }

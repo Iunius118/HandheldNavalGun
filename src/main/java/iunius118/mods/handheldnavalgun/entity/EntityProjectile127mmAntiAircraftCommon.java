@@ -19,7 +19,7 @@ public class EntityProjectile127mmAntiAircraftCommon extends EntityThrowable {
 	public int fuse = FUSE_MAX;
 	public static final float STRENGTH = 4.0F;
 	public static final float INITIAL_VELOCITY = 4.0F;
-	public static final float INACCURACY = 0.5F;
+	public static final float INACCURACY = 1.0F;
 	public float spin = 0.0F;
 
 	public EntityProjectile127mmAntiAircraftCommon(World worldIn, EntityLivingBase throwerIn, int fuseTicks) {
@@ -82,7 +82,7 @@ public class EntityProjectile127mmAntiAircraftCommon extends EntityThrowable {
 
 		this.fuse--;
 
-		this.printDebugLog();
+		//this.printDebugLog();
 
 		if (!this.isDead && (this.fuse < 1 || this.isInWater() || this.isInLava())) {
 			this.onImpact(new RayTraceResult(this));

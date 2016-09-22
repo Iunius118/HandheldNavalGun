@@ -1,5 +1,6 @@
 package iunius118.mods.handheldnavalgun;
 
+import iunius118.mods.handheldnavalgun.capability.CapabilityReloadTime;
 import iunius118.mods.handheldnavalgun.client.renderer.RenderEntityProjectile127mmAntiAircraftCommon;
 import iunius118.mods.handheldnavalgun.client.renderer.RenderItemGun127mmType89Single;
 import iunius118.mods.handheldnavalgun.entity.EntityProjectile127mmAntiAircraftCommon;
@@ -9,6 +10,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
@@ -25,7 +27,11 @@ public class HandheldNavalGunRegistry {
 
 	public enum EntityID {
 		PROJECTILE_127MM_ANTI_AIRCRAFT_COMMON,
-}
+	}
+
+	public static void registerCapabilities() {
+		CapabilityManager.INSTANCE.register(CapabilityReloadTime.IReloadTimeICapability.class, new CapabilityReloadTime.Storage(), CapabilityReloadTime.DefaultImpl.class);
+	}
 
 	public static void registerItems() {
 		GameRegistry.register(HandheldNavalGun.Items.GUN_127MM_TYPE89_SINGLE);

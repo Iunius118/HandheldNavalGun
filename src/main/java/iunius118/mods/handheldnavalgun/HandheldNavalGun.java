@@ -1,5 +1,6 @@
 package iunius118.mods.handheldnavalgun;
 
+import iunius118.mods.handheldnavalgun.capability.CapabilityReloadTime;
 import iunius118.mods.handheldnavalgun.client.RangeKeeperGun127mmType89;
 import iunius118.mods.handheldnavalgun.client.Target;
 import iunius118.mods.handheldnavalgun.client.util.ClientUtils;
@@ -21,6 +22,9 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.CapabilityInject;
+import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -55,13 +59,25 @@ public class HandheldNavalGun {
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event){
+		HandheldNavalGunRegistry.registerCapabilities();
 		HandheldNavalGunRegistry.registerItems();
 		HandheldNavalGunRegistry.resisterEntities();
+		MinecraftForge.EVENT_BUS.register(this);
 
 		if (event.getSide().isClient()) {
 			OBJLoader.INSTANCE.addDomain(MOD_ID);
-			MinecraftForge.EVENT_BUS.register(this);
 			HandheldNavalGunRegistry.registerItemModels();
+		}
+	}
+
+	public static class Capabilities {
+		@CapabilityInject(CapabilityReloadTime.IReloadTimeICapability.class)
+		private static Capability<CapabilityReloadTime.IReloadTimeICapability> RELOAD_TIMEI_CAPABILITY = null;
+
+		public static final String NAME_RELOAD_TIMEI_CAPABILITY = "reload_timei_capability";
+
+		public static Capability<CapabilityReloadTime.IReloadTimeICapability> getReloadTimeICapability() {
+			return RELOAD_TIMEI_CAPABILITY;
 		}
 	}
 
@@ -70,7 +86,15 @@ public class HandheldNavalGun {
 		public static final Item GUN_127MM_TYPE89_SINGLE  = new ItemGun127mmType89Single()
 				.setRegistryName(HandheldNavalGun.Items.NAME_ITEM_GUN_127MM_TYPE89_SINGLE)
 				.setUnlocalizedName(HandheldNavalGun.Items.NAME_ITEM_GUN_127MM_TYPE89_SINGLE)
-				.setCreativeTab(CreativeTabs.COMBAT);
+				.setCreativeTab(CreativeTabs.COMBAT)
+				.setMaxStackSize(1);
+	}
+
+	@SubscribeEvent
+	public void onItemStackLoad(AttachCapabilitiesEvent.Item event) {
+		if (event.getItem() == Items.GUN_127MM_TYPE89_SINGLE) {
+			event.addCapability(new ResourceLocation(MOD_ID, Capabilities.NAME_RELOAD_TIMEI_CAPABILITY), new CapabilityReloadTime.Provider());
+		}
 	}
 
 	@SideOnly(Side.CLIENT)
