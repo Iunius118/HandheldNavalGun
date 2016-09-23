@@ -1,9 +1,10 @@
 package iunius118.mods.handheldnavalgun.client.renderer;
 
-import iunius118.mods.handheldnavalgun.entity.EntityProjectile127mmAntiAircraftCommon;
-
 import java.util.List;
 
+import org.lwjgl.opengl.GL11;
+
+import iunius118.mods.handheldnavalgun.entity.EntityProjectile127mmAntiAircraftCommon;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.ItemModelMesher;
@@ -22,8 +23,6 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.pipeline.LightUtil;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
-
-import org.lwjgl.opengl.GL11;
 
 
 public class RenderEntityProjectile127mmAntiAircraftCommon<T extends EntityProjectile127mmAntiAircraftCommon> extends Render<T> {
@@ -49,7 +48,7 @@ public class RenderEntityProjectile127mmAntiAircraftCommon<T extends EntityProje
 
 		this.bindEntityTexture(entity);
 
-        // transform
+		// transform
 		GlStateManager.pushMatrix();
 		GlStateManager.translate((float) x, (float) y + 0.125F, (float) z);
 		GlStateManager.rotate(entityYaw - 90.0F, 0.0F, 1.0F, 0.0F);
@@ -109,6 +108,3 @@ public class RenderEntityProjectile127mmAntiAircraftCommon<T extends EntityProje
 	}
 
 }
-
-
-

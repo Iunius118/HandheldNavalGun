@@ -4,6 +4,14 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.List;
 
+import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.util.glu.GLU;
+
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
+import com.sun.istack.internal.Nullable;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EntitySelectors;
@@ -14,14 +22,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.util.glu.GLU;
-
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
-import com.sun.istack.internal.Nullable;
 
 @SideOnly(Side.CLIENT)
 public class ClientUtils {
@@ -153,23 +153,23 @@ public class ClientUtils {
 			Vec3d vec3EyesBlock = viewEntity.getPositionEyes(partialTicks);
 			Vec3d vec3ReachBlock = vec3EyesBlock.add(vec3Look.scale((d0 > 100.0D) ? 100.0D : d0));
 
-	        for (int c = (int)Math.ceil(d0 / 100.0D); c > 0; c--) {
-	        	objectMouseOver = world.rayTraceBlocks(vec3EyesBlock, vec3ReachBlock, true, false, true);
-	        	vec3EyesBlock = vec3ReachBlock;
+			for (int c = (int)Math.ceil(d0 / 100.0D); c > 0; c--) {
+				objectMouseOver = world.rayTraceBlocks(vec3EyesBlock, vec3ReachBlock, true, false, true);
+				vec3EyesBlock = vec3ReachBlock;
 
-	        	if (objectMouseOver != null) {
-	        		if (objectMouseOver.typeOfHit != RayTraceResult.Type.MISS) {
-	        			break;
-	        		} else if (objectMouseOver.hitVec != null) {
-	        			vec3EyesBlock = objectMouseOver.hitVec;
-	        		}
-	        	}
+				if (objectMouseOver != null) {
+					if (objectMouseOver.typeOfHit != RayTraceResult.Type.MISS) {
+						break;
+					} else if (objectMouseOver.hitVec != null) {
+						vec3EyesBlock = objectMouseOver.hitVec;
+					}
+				}
 
-	        	d0 -= 100.0D;
-	        	vec3ReachBlock = vec3ReachBlock.add(vec3Look.scale((d0 > 100.0D) ? 100.0D : d0));
-	        }
+				d0 -= 100.0D;
+				vec3ReachBlock = vec3ReachBlock.add(vec3Look.scale((d0 > 100.0D) ? 100.0D : d0));
+			}
 
-	        double d1 = distance;
+			double d1 = distance;
 
 			if (objectMouseOver != null) {
 				d1 = objectMouseOver.hitVec.distanceTo(vec3Eyes);

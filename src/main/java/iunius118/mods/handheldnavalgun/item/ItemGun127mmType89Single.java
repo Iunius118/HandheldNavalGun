@@ -43,8 +43,7 @@ public class ItemGun127mmType89Single extends Item {
 
 				if (d > 100.0D) {
 					HandheldNavalGun.INSTANCE.target = new Target(entityLiving.worldObj, result);
-
-					System.out.println(result);
+					// System.out.println(result);
 				} else {
 					if (result.typeOfHit == RayTraceResult.Type.BLOCK) {
 						HandheldNavalGun.INSTANCE.target = null;
@@ -127,7 +126,7 @@ public class ItemGun127mmType89Single extends Item {
 
 	/*
 	 * Reload system
-	 * 	S(cap= 0, nbt= 0), C(cap= 0, nbt= 0) at onUpdate
+	 *  S(cap= 0, nbt= 0), C(cap= 0, nbt= 0) at onUpdate
 	 *  S(cap=80, nbt=80), C(cap= 0, nbt= 0) SHOT and update Server NBT and capability at onItemRightClick
 	 *   +1
 	 *  S(cap=80, nbt=80), C(cap= 0, nbt=80) sync NBT and renew Client ItemStack

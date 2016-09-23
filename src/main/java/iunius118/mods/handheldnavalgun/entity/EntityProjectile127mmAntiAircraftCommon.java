@@ -97,25 +97,25 @@ public class EntityProjectile127mmAntiAircraftCommon extends EntityThrowable {
 
 	@Override
 	protected void onImpact(RayTraceResult result) {
-        if (!this.worldObj.isRemote) {
-        	WorldServer world = (WorldServer)this.worldObj;
+		if (!this.worldObj.isRemote) {
+			WorldServer world = (WorldServer)this.worldObj;
 
-        	if (this.ticksExisted > 3) {
-	        	world.spawnParticle(EnumParticleTypes.EXPLOSION_HUGE, true, this.posX, this.posY, this.posZ, 1, 0.0D, 0.0D, 0.0D, 0.0D, new int[0]);
-	        	world.playSound(null, this.posX, this.posY, this.posZ, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.BLOCKS, 4.0F, (1.0F + (this.worldObj.rand.nextFloat() - this.worldObj.rand.nextFloat()) * 0.2F) * 0.7F);
-	        	world.createExplosion(this.getThrower(), this.posX, this.posY, this.posZ, this.STRENGTH, false);
-        	} else {
-        		if (result.typeOfHit == RayTraceResult.Type.ENTITY) {
-        			if (result.entityHit instanceof EntityPlayer) {
-        				result.entityHit.attackEntityFrom(DamageSource.causePlayerDamage((EntityPlayer)this.getThrower()), 40.0F);
-        			} else {
-        				result.entityHit.attackEntityFrom(DamageSource.causeMobDamage(this.getThrower()), 40.0F);
-        			}
-        		}
-        	}
-        }
+			if (this.ticksExisted > 3) {
+				world.spawnParticle(EnumParticleTypes.EXPLOSION_HUGE, true, this.posX, this.posY, this.posZ, 1, 0.0D, 0.0D, 0.0D, 0.0D, new int[0]);
+				world.playSound(null, this.posX, this.posY, this.posZ, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.BLOCKS, 4.0F, (1.0F + (this.worldObj.rand.nextFloat() - this.worldObj.rand.nextFloat()) * 0.2F) * 0.7F);
+				world.createExplosion(this.getThrower(), this.posX, this.posY, this.posZ, this.STRENGTH, false);
+			} else {
+				if (result.typeOfHit == RayTraceResult.Type.ENTITY) {
+					if (result.entityHit instanceof EntityPlayer) {
+						result.entityHit.attackEntityFrom(DamageSource.causePlayerDamage((EntityPlayer)this.getThrower()), 40.0F);
+					} else {
+						result.entityHit.attackEntityFrom(DamageSource.causeMobDamage(this.getThrower()), 40.0F);
+					}
+				}
+			}
+		}
 
-        this.setDead();
+		this.setDead();
 	}
 
 	@Override
