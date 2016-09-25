@@ -1,4 +1,4 @@
-package iunius118.mods.handheldnavalgun.client;
+package iunius118.mods.handheldnavalgun.client.util;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.boss.EntityDragonPart;

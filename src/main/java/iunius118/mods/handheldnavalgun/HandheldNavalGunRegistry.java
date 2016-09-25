@@ -5,7 +5,7 @@ import iunius118.mods.handheldnavalgun.client.renderer.RenderEntityProjectile127
 import iunius118.mods.handheldnavalgun.client.renderer.RenderItemGun127mmType89Single;
 import iunius118.mods.handheldnavalgun.entity.EntityProjectile127mmAntiAircraftCommon;
 import iunius118.mods.handheldnavalgun.tileentity.TileEntityItemGun127mmType89Single;
-import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.event.ModelBakeEvent;
@@ -44,12 +44,12 @@ public class HandheldNavalGunRegistry {
 						new ItemStack(HandheldNavalGun.Items.GUN_127MM_TYPE89_SINGLE),
 						" i ",
 						"isi",
-						"grC",
+						"grc",
 						'i', "ingotIron",
 						's', "slimeball",
 						'g', "paneGlass",
 						'r', "dustRedstone",
-						'C', Blocks.CAKE)
+						'c', Items.CLOCK)
 				);
 	}
 

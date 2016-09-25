@@ -2,8 +2,8 @@ package iunius118.mods.handheldnavalgun.item;
 
 import iunius118.mods.handheldnavalgun.HandheldNavalGun;
 import iunius118.mods.handheldnavalgun.capability.CapabilityReloadTime;
-import iunius118.mods.handheldnavalgun.client.Target;
 import iunius118.mods.handheldnavalgun.client.util.ClientUtils;
+import iunius118.mods.handheldnavalgun.client.util.Target;
 import iunius118.mods.handheldnavalgun.entity.EntityProjectile127mmAntiAircraftCommon;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;

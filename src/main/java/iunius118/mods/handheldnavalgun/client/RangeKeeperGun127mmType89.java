@@ -2,6 +2,7 @@ package iunius118.mods.handheldnavalgun.client;
 
 import iunius118.mods.handheldnavalgun.HandheldNavalGun;
 import iunius118.mods.handheldnavalgun.client.util.ClientUtils;
+import iunius118.mods.handheldnavalgun.client.util.Target;
 import iunius118.mods.handheldnavalgun.entity.EntityProjectile127mmAntiAircraftCommon;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;

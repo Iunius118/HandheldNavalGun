@@ -1,25 +1,15 @@
 package iunius118.mods.handheldnavalgun;
 
 import iunius118.mods.handheldnavalgun.capability.CapabilityReloadTime;
-import iunius118.mods.handheldnavalgun.client.RangeKeeperGun127mmType89;
-import iunius118.mods.handheldnavalgun.client.Target;
-import iunius118.mods.handheldnavalgun.client.util.ClientUtils;
+import iunius118.mods.handheldnavalgun.client.ClientEventHandler;
+import iunius118.mods.handheldnavalgun.client.util.Target;
 import iunius118.mods.handheldnavalgun.entity.EntityProjectile127mmAntiAircraftCommon;
 import iunius118.mods.handheldnavalgun.item.ItemGun127mmType89Single;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.Vec3d;
-import net.minecraftforge.client.event.ModelBakeEvent;
-import net.minecraftforge.client.event.RenderGameOverlayEvent;
-import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
@@ -32,8 +22,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import org.lwjgl.opengl.GL11;
-
 @Mod(modid = HandheldNavalGun.MOD_ID,
 	name = HandheldNavalGun.MOD_NAME,
 	version = HandheldNavalGun.MOD_VERSION,
@@ -44,9 +32,9 @@ public class HandheldNavalGun {
 
 	public static final String MOD_ID = "handheldnavalgun";
 	public static final String MOD_NAME = "HandheldNavalGun";
-	public static final String MOD_VERSION = "0.0.1";
-	public static final String MOD_DEPENDENCIES = "required-after:Forge@[1.9.4-12.17.0.1976,)";
-	public static final String MOD_ACCEPTED_MC_VERSIONS = "[1.9.4,]";
+	public static final String MOD_VERSION = "0.0.1 beta";
+	public static final String MOD_DEPENDENCIES = "required-after:Forge@[1.10.2-12.18.1.2011,)";
+	public static final String MOD_ACCEPTED_MC_VERSIONS = "[1.10.2,]";
 
 	@Mod.Instance(MOD_ID)
 	public static HandheldNavalGun INSTANCE;
@@ -67,6 +55,7 @@ public class HandheldNavalGun {
 		if (event.getSide().isClient()) {
 			OBJLoader.INSTANCE.addDomain(MOD_ID);
 			HandheldNavalGunRegistry.registerItemModels();
+			MinecraftForge.EVENT_BUS.register(ClientEventHandler.INSTANCE);
 		}
 	}
 
@@ -90,91 +79,17 @@ public class HandheldNavalGun {
 				.setMaxStackSize(1);
 	}
 
+	@SideOnly(Side.CLIENT)
+	public static class ModelLocations {
+		public static final ModelResourceLocation MRL_ITEM_GUN_127MM_TYPE89_SINGLE = new ModelResourceLocation(HandheldNavalGun.MOD_ID + ":gun_127mm_type89_1", "inventory");
+
+		//public static final ResourceLocation RL_OBJ_ITEM_GUN_127MM_TYPE89_SINGLE = new ResourceLocation(HandheldNavalGun.MOD_ID + ":item/gun_127mm_type89_1.obj");
+	}
+
 	@SubscribeEvent
 	public void onItemStackLoad(AttachCapabilitiesEvent.Item event) {
 		if (event.getItem() == Items.GUN_127MM_TYPE89_SINGLE) {
 			event.addCapability(new ResourceLocation(MOD_ID, Capabilities.NAME_RELOAD_TIMEI_CAPABILITY), new CapabilityReloadTime.Provider());
-		}
-	}
-
-	@SideOnly(Side.CLIENT)
-	public static class ModelLocations {
-		public static final ModelResourceLocation MRL_ITEM_GUN_127MM_TYPE89_SINGLE = new ModelResourceLocation(MOD_ID + ":gun_127mm_type89_1", "inventory");
-
-		public static final ResourceLocation RL_OBJ_ITEM_GUN_127MM_TYPE89_SINGLE = new ResourceLocation(MOD_ID + ":item/gun_127mm_type89_1.obj");
-	}
-
-	@SideOnly(Side.CLIENT)
-	@SubscribeEvent
-	public void onModelBakeEvent(ModelBakeEvent event) {
-		HandheldNavalGunRegistry.registerBakedModels(event);
-		HandheldNavalGunRegistry.registerRenderers();
-	}
-
-	@SideOnly(Side.CLIENT)
-	@SubscribeEvent
-	public void onRenderWorldLastEvent(RenderWorldLastEvent event) {
-		this.vec3Target = null;
-		this.vec3Marker = null;
-		this.ticksFuse = EntityProjectile127mmAntiAircraftCommon.FUSE_MAX;
-
-		if (Minecraft.getMinecraft().getRenderManager().options != null && Minecraft.getMinecraft().getRenderManager().options.thirdPersonView > 0) {
-			return;
-		}
-
-		if (this.target != null) {
-			Vec3d pos = this.target.getPos(Minecraft.getMinecraft().theWorld, event.getPartialTicks());
-
-			if (pos != null) {
-				this.vec3Target = ClientUtils.getScreenPos(pos, event.getPartialTicks());
-				this.vec3Marker = RangeKeeperGun127mmType89.getTargetFutureScreenPos(Minecraft.getMinecraft().theWorld, this.target, event.getPartialTicks());
-			} else {
-				this.target = null;
-			}
-		}
-	}
-
-	@SideOnly(Side.CLIENT)
-	@SubscribeEvent
-	public void onRenderGameOverlayEventPre(RenderGameOverlayEvent.Pre event) {
-		if (event.getType() == ElementType.HOTBAR && Minecraft.getMinecraft().getRenderManager().getFontRenderer() != null) {
-			Tessellator tessellator = Tessellator.getInstance();
-			VertexBuffer vertexbuffer = tessellator.getBuffer();
-			Minecraft mc = Minecraft.getMinecraft();
-			int displayHeight = mc.displayHeight;
-			double markerSize = 4.0D;
-
-			GlStateManager.disableDepth();
-			GlStateManager.enableBlend();
-			GlStateManager.disableTexture2D();
-			GlStateManager.color(0.0F, 1.0F, 0.0F, 1.0F);
-			GlStateManager.glLineWidth(1.0F);
-
-			if (vec3Target != null) {
-				double x = this.vec3Target.xCoord;
-				double y = this.vec3Target.yCoord;
-				vertexbuffer.begin(GL11.GL_LINE_LOOP, DefaultVertexFormats.POSITION);
-				vertexbuffer.pos(x - markerSize, y - markerSize, 0.0D).endVertex();
-				vertexbuffer.pos(x + markerSize, y - markerSize, 0.0D).endVertex();
-				vertexbuffer.pos(x + markerSize, y + markerSize, 0.0D).endVertex();
-				vertexbuffer.pos(x - markerSize, y + markerSize, 0.0D).endVertex();
-				tessellator.draw();
-			}
-
-			if (vec3Marker != null) {
-				double x = this.vec3Marker.xCoord;
-				double y = this.vec3Marker.yCoord;
-				vertexbuffer.begin(GL11.GL_LINE_LOOP, DefaultVertexFormats.POSITION);
-				vertexbuffer.pos(x, y - markerSize, 0.0D).endVertex();
-				vertexbuffer.pos(x + markerSize, y, 0.0D).endVertex();
-				vertexbuffer.pos(x, y + markerSize, 0.0D).endVertex();
-				vertexbuffer.pos(x - markerSize, y, 0.0D).endVertex();
-				tessellator.draw();
-			}
-
-			GlStateManager.enableTexture2D();
-			GlStateManager.enableDepth();
-
 		}
 	}
 
