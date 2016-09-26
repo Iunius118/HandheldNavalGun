@@ -51,6 +51,20 @@ public class Target {
 		this.worldHashCode = world.hashCode();;
 	}
 
+	public boolean isValid(World world) {
+		if (this.worldHashCode != world.hashCode()) {
+			return false;
+		} else if (this.type == Type.ENTITY) {
+			Entity entity = world.getEntityByID(this.entityId);
+
+			if (entity == null || entity.isDead) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	public Vec3d getPos(World world, float partialTicks) {
 		if (this.worldHashCode != world.hashCode()) {
 			return null;

@@ -1,6 +1,5 @@
 package iunius118.mods.handheldnavalgun.client;
 
-import iunius118.mods.handheldnavalgun.HandheldNavalGun;
 import iunius118.mods.handheldnavalgun.client.util.ClientUtils;
 import iunius118.mods.handheldnavalgun.client.util.Target;
 import iunius118.mods.handheldnavalgun.entity.EntityProjectile127mmAntiAircraftCommon;
@@ -11,19 +10,84 @@ import net.minecraft.world.World;
 
 public class RangeKeeperGun127mmType89 {
 
-	public static Vec3d getTargetFutureScreenPos(World world, Target target, float partialTicks) {
-		Entity player = Minecraft.getMinecraft().thePlayer;
-		double px = player.lastTickPosX + (player.posX - player.lastTickPosX) * partialTicks;
-		double py = player.lastTickPosY + (player.posY - player.lastTickPosY) * partialTicks + player.getEyeHeight();
-		double pz = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * partialTicks;
-		Vec3d vec3Player = new Vec3d(px, py, pz);
-		final double v0sq = EntityProjectile127mmAntiAircraftCommon.INITIAL_VELOCITY * EntityProjectile127mmAntiAircraftCommon.INITIAL_VELOCITY;
-		Vec3d vec3Target1 = target.getPos(world, partialTicks + 1.0F);
-		Vec3d vec3DeltaTarget = target.getDeltaPos(world);
+	public Target target;
+	public int ticksFuse = EntityProjectile127mmAntiAircraftCommon.FUSE_MAX;
+
+	public double futureYaw;
+	public double futurePitch;
+	public double prevFutureYaw;
+	public double prevFuturePitch;
+
+	private boolean isValid;
+
+	public boolean isValid() {
+		return this.isValid;
+	}
+
+	public void setTarget(Target targetIn) {
+		this.target = targetIn;
+	}
+
+	public Target getTarget() {
+		return this.target;
+	}
+
+	public void setFuse(int ticks) {
+		if (ticks < 0) {
+			this.ticksFuse = 0;
+		} else if (ticks > EntityProjectile127mmAntiAircraftCommon.FUSE_MAX) {
+			this.setFuseMax();
+		} else {
+			this.ticksFuse = ticks;
+		}
+	}
+
+	public void setFuseMax() {
+		this.ticksFuse = EntityProjectile127mmAntiAircraftCommon.FUSE_MAX;
+	}
+
+	public int getFuse() {
+		return this.ticksFuse;
+	}
+
+	public Vec3d getTargetScreenPos(World world, float partialTicks) {
+		return ClientUtils.getScreenPos(target.getPos(world, partialTicks), partialTicks);
+	}
+
+	public Vec3d getTargetFutureScreenPos(World world, float partialTicks) {
+		if (this.isValid) {
+			double yaw = futureYaw;
+			double pitch = futurePitch;
+
+			return ClientUtils.getScreenPos((float)yaw, (float)pitch, partialTicks);
+		}
+
+		return null;
+	}
+
+	public boolean updatetFutureTarget(World world) {
+		this.prevFutureYaw = this.futureYaw;
+		this.prevFuturePitch = this.futurePitch;
+
+		if (this.target == null) {
+			return setIsValid(false);
+		}
+
+		Vec3d vec3Target1 = this.target.getPos(world, 2.0F);
+		Vec3d vec3DeltaTarget = this.target.getDeltaPos(world);
 
 		if (vec3Target1 == null || vec3DeltaTarget == null) {
-			return null;
+			return setIsValid(false);
 		}
+
+		Entity player = Minecraft.getMinecraft().thePlayer;
+
+		if (player == null) {
+			return setIsValid(false);
+		}
+
+		Vec3d vec3Player = new Vec3d(player.posX, player.posY + player.getEyeHeight(), player.posZ);
+		final double v0sq = EntityProjectile127mmAntiAircraftCommon.INITIAL_VELOCITY * EntityProjectile127mmAntiAircraftCommon.INITIAL_VELOCITY;
 
 		int t;
 
@@ -58,19 +122,19 @@ public class RangeKeeperGun127mmType89 {
 
 			if ((v0sq1 > v0sq2 && v0sq1 >= v0sq && v0sq2 < v0sq) || (v0sq1 < v0sq2 && v0sq1 < v0sq && v0sq2 >= v0sq)) {
 				if (Math.abs(v0sq1 - v0sq) <= Math.abs(v0sq2 - v0sq)) {
-					HandheldNavalGun.INSTANCE.ticksFuse = t;
-					double theta = (tx1 != 0.0D) ? Math.toDegrees(Math.atan2(- vec3Target1.xCoord + vec3Player.xCoord, vec3Target1.zCoord - vec3Player.zCoord)) : 0.0D;
-					double a = -Math.toDegrees(Math.atan2(v0y1, v0x1));
-					return ClientUtils.getScreenPos((float)theta, (float)a, partialTicks);
+					this.ticksFuse = t;
+					this.futureYaw = (tx1 != 0.0D) ? Math.toDegrees(Math.atan2(- vec3Target1.xCoord + vec3Player.xCoord, vec3Target1.zCoord - vec3Player.zCoord)) : 0.0D;
+					this.futurePitch = -Math.toDegrees(Math.atan2(v0y1, v0x1));
+					return setIsValid(true);
 				} else {
 					if (t < EntityProjectile127mmAntiAircraftCommon.FUSE_MAX) {
 						t++;
 					}
 
-					HandheldNavalGun.INSTANCE.ticksFuse = t;
-					double theta = (tx2 != 0.0D) ? Math.toDegrees(Math.atan2(- vec3Target2.xCoord + vec3Player.xCoord, vec3Target2.zCoord - vec3Player.zCoord)) : 0.0D;
-					double a = -Math.toDegrees(Math.atan2(v0y2, v0x2));
-					return ClientUtils.getScreenPos((float)theta, (float)a, partialTicks);
+					this.ticksFuse = t;
+					this.futureYaw = (tx2 != 0.0D) ? Math.toDegrees(Math.atan2(- vec3Target2.xCoord + vec3Player.xCoord, vec3Target2.zCoord - vec3Player.zCoord)) : 0.0D;
+					this.futurePitch = -Math.toDegrees(Math.atan2(v0y2, v0x2));
+					return setIsValid(true);
 				}
 			}
 
@@ -82,7 +146,12 @@ public class RangeKeeperGun127mmType89 {
 			v0sq1 = v0sq2;
 		}
 
-		return null;
+		return setIsValid(false);
+	}
+
+	public boolean setIsValid(boolean is_valid) {
+		this.isValid = is_valid;
+		return is_valid;
 	}
 
 }

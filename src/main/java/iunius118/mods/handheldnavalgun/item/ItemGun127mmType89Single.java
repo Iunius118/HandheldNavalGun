@@ -2,6 +2,7 @@ package iunius118.mods.handheldnavalgun.item;
 
 import iunius118.mods.handheldnavalgun.HandheldNavalGun;
 import iunius118.mods.handheldnavalgun.capability.CapabilityReloadTime;
+import iunius118.mods.handheldnavalgun.client.RangeKeeperGun127mmType89;
 import iunius118.mods.handheldnavalgun.client.util.ClientUtils;
 import iunius118.mods.handheldnavalgun.client.util.Target;
 import iunius118.mods.handheldnavalgun.entity.EntityProjectile127mmAntiAircraftCommon;
@@ -37,22 +38,23 @@ public class ItemGun127mmType89Single extends Item {
 
 		if (entityLiving.worldObj.isRemote && entityLiving == Minecraft.getMinecraft().thePlayer) {
 			RayTraceResult result = ClientUtils.getMouseOver(256.0D, 1.0F);
+			RangeKeeperGun127mmType89 rangeKeeper = HandheldNavalGun.INSTANCE.rangeKeeper;
 
 			if (result != null && result.typeOfHit != RayTraceResult.Type.MISS) {
 				double d = result.hitVec.squareDistanceTo(entityLiving.posX, entityLiving.posY, entityLiving.posZ);
 
 				if (d > 100.0D) {
-					HandheldNavalGun.INSTANCE.target = new Target(entityLiving.worldObj, result);
+					rangeKeeper.setTarget(new Target(entityLiving.worldObj, result));
 					// System.out.println(result);
 				} else {
 					if (result.typeOfHit == RayTraceResult.Type.BLOCK) {
-						HandheldNavalGun.INSTANCE.target = null;
+						rangeKeeper.setTarget(null);
 					} else {
-						HandheldNavalGun.INSTANCE.target = new Target(entityLiving.worldObj, result);
+						rangeKeeper.setTarget(new Target(entityLiving.worldObj, result));
 					}
 				}
 			} else {
-				HandheldNavalGun.INSTANCE.target = null;
+				rangeKeeper.setTarget(null);
 			}
 		}
 
@@ -70,10 +72,11 @@ public class ItemGun127mmType89Single extends Item {
 				WorldServer world = (WorldServer)worldIn;
 
 				EntityProjectile127mmAntiAircraftCommon entity = new EntityProjectile127mmAntiAircraftCommon(world, playerIn);
+				RangeKeeperGun127mmType89 rangeKeeper = HandheldNavalGun.INSTANCE.rangeKeeper;
 
-				if (HandheldNavalGun.INSTANCE.vec3Marker != null) {
-					if (HandheldNavalGun.INSTANCE.ticksFuse > 3) {
-						entity.setFuse(HandheldNavalGun.INSTANCE.ticksFuse);
+				if (rangeKeeper.isValid()) {
+					if (rangeKeeper.getFuse() > 3) {
+						entity.setFuse(rangeKeeper.getFuse());
 					}
 				}
 

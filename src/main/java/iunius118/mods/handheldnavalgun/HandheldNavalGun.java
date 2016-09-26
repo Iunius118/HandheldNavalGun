@@ -2,8 +2,7 @@ package iunius118.mods.handheldnavalgun;
 
 import iunius118.mods.handheldnavalgun.capability.CapabilityReloadTime;
 import iunius118.mods.handheldnavalgun.client.ClientEventHandler;
-import iunius118.mods.handheldnavalgun.client.util.Target;
-import iunius118.mods.handheldnavalgun.entity.EntityProjectile127mmAntiAircraftCommon;
+import iunius118.mods.handheldnavalgun.client.RangeKeeperGun127mmType89;
 import iunius118.mods.handheldnavalgun.item.ItemGun127mmType89Single;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
@@ -39,11 +38,9 @@ public class HandheldNavalGun {
 	@Mod.Instance(MOD_ID)
 	public static HandheldNavalGun INSTANCE;
 
-	public Target target = null;
+	public final RangeKeeperGun127mmType89 rangeKeeper = new RangeKeeperGun127mmType89();
 	public Vec3d vec3Target = null;
 	public Vec3d vec3Marker = null;
-	public int ticksFuse = EntityProjectile127mmAntiAircraftCommon.FUSE_MAX;
-
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event){

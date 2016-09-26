@@ -44,10 +44,14 @@ public class EntityProjectile127mmAntiAircraftCommon extends EntityThrowable {
 		if (ticks < 0) {
 			this.fuse = 0;
 		} else if (ticks > this.FUSE_MAX) {
-			this.fuse = this.FUSE_MAX;
+			this.setFuseMax();
 		} else {
 			this.fuse = ticks;
 		}
+	}
+
+	public void setFuseMax() {
+		this.fuse = this.FUSE_MAX;
 	}
 
 	public int getFuse() {

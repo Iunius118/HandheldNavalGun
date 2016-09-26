@@ -59,20 +59,21 @@ public class ClientUtils {
 			double y = pos.yCoord - (viewEntity.lastTickPosY + (viewEntity.posY - viewEntity.lastTickPosY) * partialTicks) - viewEntity.getEyeHeight();
 			double z = pos.zCoord - (viewEntity.lastTickPosZ + (viewEntity.posZ - viewEntity.lastTickPosZ) * partialTicks);
 
-			if (x == 0.0D && y == 0.0D && z == 0.0D) {
-				return null;
-			}
-
 			Vec3d look = viewEntity.getLook(partialTicks);
 
 			if (Minecraft.getMinecraft().getRenderManager().options != null && Minecraft.getMinecraft().getRenderManager().options.thirdPersonView == 2) {
 				look = look.scale(-1);
 			}
 
-			double deg = Math.toDegrees(Math.acos((x * look.xCoord + y * look.yCoord + z * look.zCoord) / (Math.sqrt(x * x + y * y + z * z) * look.lengthVector())));
+			double deg = 0.0D;
 
-			if (deg < 90) {
-				return ClientUtils.getScreenCoordsFrom3dCoords((float)x, (float)y + viewEntity.getEyeHeight(), (float)z);
+			if (x != 0.0D || y != 0.0D || z != 0.0D) {
+				double d = (x * look.xCoord + y * look.yCoord + z * look.zCoord) / (Math.sqrt(x * x + y * y + z * z) * look.lengthVector());
+				if (d < 0.0D) {
+					return null;
+				} else {
+					return ClientUtils.getScreenCoordsFrom3dCoords((float)x, (float)y + viewEntity.getEyeHeight(), (float)z);
+				}
 			}
 		}
 
