@@ -1,17 +1,21 @@
 package iunius118.mods.handheldnavalgun.item;
 
+import javax.annotation.Nullable;
+
 import iunius118.mods.handheldnavalgun.HandheldNavalGun;
 import iunius118.mods.handheldnavalgun.capability.CapabilityReloadTime;
 import iunius118.mods.handheldnavalgun.client.RangeKeeperGun127mmType89;
 import iunius118.mods.handheldnavalgun.client.util.ClientUtils;
 import iunius118.mods.handheldnavalgun.client.util.Target;
 import iunius118.mods.handheldnavalgun.entity.EntityProjectile127mmAntiAircraftCommon;
+import net.minecraft.block.BlockTNT;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ActionResult;
@@ -31,6 +35,29 @@ public class ItemGun127mmType89Single extends Item {
 
 	public ItemGun127mmType89Single() {
 		super();
+	}
+
+	@Nullable
+	public ItemStack findAmmo(EntityPlayer player) {
+		if (this.isAmmo(player.getHeldItem(EnumHand.OFF_HAND))) {
+			return player.getHeldItem(EnumHand.OFF_HAND);
+		} else if (this.isAmmo(player.getHeldItem(EnumHand.MAIN_HAND))) {
+			return player.getHeldItem(EnumHand.MAIN_HAND);
+		} else {
+			for (int i = 0; i < player.inventory.getSizeInventory(); ++i) {
+				ItemStack itemstack = player.inventory.getStackInSlot(i);
+
+				if (this.isAmmo(itemstack)) {
+					return itemstack;
+				}
+			}
+
+			return null;
+		}
+	}
+
+	public boolean isAmmo(@Nullable ItemStack stack) {
+		return stack != null && stack.getItem() instanceof ItemBlock && ((ItemBlock)stack.getItem()).getBlock() instanceof BlockTNT;
 	}
 
 	@Override
@@ -69,6 +96,21 @@ public class ItemGun127mmType89Single extends Item {
 		if (cap.getReloadTime() == 0 && nbt != null && nbt.getInteger(this.TAG_RELOAD_TIME) == 0) {
 
 			if (!worldIn.isRemote) {	// Server: Shot
+
+				if (!playerIn.capabilities.isCreativeMode) {
+					ItemStack stackAmmo = this.findAmmo(playerIn);
+
+					if (stackAmmo == null) {
+						return new ActionResult<>(EnumActionResult.FAIL, itemStackIn);
+					} else {
+						--stackAmmo.stackSize;
+
+						if (stackAmmo.stackSize <= 0) {
+							playerIn.inventory.deleteStack(stackAmmo);
+						}
+					}
+				}
+
 				WorldServer world = (WorldServer)worldIn;
 
 				EntityProjectile127mmAntiAircraftCommon entity = new EntityProjectile127mmAntiAircraftCommon(world, playerIn);
@@ -94,10 +136,10 @@ public class ItemGun127mmType89Single extends Item {
 				// System.out.println("SHOT");
 			}
 
-			return new ActionResult(EnumActionResult.SUCCESS, itemStackIn);
+			return new ActionResult<>(EnumActionResult.SUCCESS, itemStackIn);
 		}
 
-		return new ActionResult(EnumActionResult.PASS, itemStackIn);
+		return new ActionResult<>(EnumActionResult.PASS, itemStackIn);
 	}
 
 	@Override

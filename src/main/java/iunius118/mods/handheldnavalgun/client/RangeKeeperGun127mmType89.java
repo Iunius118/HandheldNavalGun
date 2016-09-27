@@ -1,5 +1,7 @@
 package iunius118.mods.handheldnavalgun.client;
 
+import javax.annotation.Nullable;
+
 import iunius118.mods.handheldnavalgun.client.util.ClientUtils;
 import iunius118.mods.handheldnavalgun.client.util.Target;
 import iunius118.mods.handheldnavalgun.entity.EntityProjectile127mmAntiAircraftCommon;
@@ -24,10 +26,11 @@ public class RangeKeeperGun127mmType89 {
 		return this.isValid;
 	}
 
-	public void setTarget(Target targetIn) {
+	public void setTarget(@Nullable Target targetIn) {
 		this.target = targetIn;
 	}
 
+	@Nullable
 	public Target getTarget() {
 		return this.target;
 	}
@@ -50,10 +53,12 @@ public class RangeKeeperGun127mmType89 {
 		return this.ticksFuse;
 	}
 
+	@Nullable
 	public Vec3d getTargetScreenPos(World world, float partialTicks) {
 		return ClientUtils.getScreenPos(target.getPos(world, partialTicks), partialTicks);
 	}
 
+	@Nullable
 	public Vec3d getTargetFutureScreenPos(World world, float partialTicks) {
 		if (this.isValid) {
 			double yaw = futureYaw;

@@ -1,5 +1,7 @@
 package iunius118.mods.handheldnavalgun.client.util;
 
+import javax.annotation.Nullable;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.boss.EntityDragonPart;
 import net.minecraft.util.math.RayTraceResult;
@@ -65,6 +67,7 @@ public class Target {
 		return true;
 	}
 
+	@Nullable
 	public Vec3d getPos(World world, float partialTicks) {
 		if (this.worldHashCode != world.hashCode()) {
 			return null;
@@ -84,6 +87,7 @@ public class Target {
 		return null;
 	}
 
+	@Nullable
 	public Vec3d getDeltaPos(World world) {
 		if (this.worldHashCode != world.hashCode()) {
 			return null;

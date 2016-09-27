@@ -1,5 +1,7 @@
 package iunius118.mods.handheldnavalgun;
 
+import javax.annotation.Nullable;
+
 import iunius118.mods.handheldnavalgun.capability.CapabilityReloadTime;
 import iunius118.mods.handheldnavalgun.client.ClientEventHandler;
 import iunius118.mods.handheldnavalgun.client.RangeKeeperGun127mmType89;
@@ -62,6 +64,7 @@ public class HandheldNavalGun {
 
 		public static final String NAME_RELOAD_TIMEI_CAPABILITY = "reload_timei_capability";
 
+		@Nullable
 		public static Capability<CapabilityReloadTime.IReloadTimeICapability> getReloadTimeICapability() {
 			return RELOAD_TIMEI_CAPABILITY;
 		}

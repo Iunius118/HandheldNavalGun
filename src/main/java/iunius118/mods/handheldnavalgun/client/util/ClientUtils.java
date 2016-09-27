@@ -4,13 +4,14 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
-import com.sun.istack.internal.Nullable;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -52,9 +53,12 @@ public class ClientUtils {
 		return d;
 	}
 
-	public static Vec3d getScreenPos(Vec3d pos, float partialTicks) {
-		if (pos != null) {
-			Entity viewEntity = Minecraft.getMinecraft().getRenderViewEntity();
+	@Nullable
+	public static Vec3d getScreenPos(@Nullable Vec3d pos, float partialTicks) {
+		Entity viewEntity = Minecraft.getMinecraft().getRenderViewEntity();
+
+		if (pos != null && viewEntity != null) {
+
 			double x = pos.xCoord - (viewEntity.lastTickPosX + (viewEntity.posX - viewEntity.lastTickPosX) * partialTicks);
 			double y = pos.yCoord - (viewEntity.lastTickPosY + (viewEntity.posY - viewEntity.lastTickPosY) * partialTicks) - viewEntity.getEyeHeight();
 			double z = pos.zCoord - (viewEntity.lastTickPosZ + (viewEntity.posZ - viewEntity.lastTickPosZ) * partialTicks);
@@ -64,8 +68,6 @@ public class ClientUtils {
 			if (Minecraft.getMinecraft().getRenderManager().options != null && Minecraft.getMinecraft().getRenderManager().options.thirdPersonView == 2) {
 				look = look.scale(-1);
 			}
-
-			double deg = 0.0D;
 
 			if (x != 0.0D || y != 0.0D || z != 0.0D) {
 				double d = (x * look.xCoord + y * look.yCoord + z * look.zCoord) / (Math.sqrt(x * x + y * y + z * z) * look.lengthVector());
@@ -80,15 +82,16 @@ public class ClientUtils {
 		return null;
 	}
 
+	@Nullable
 	public static Vec3d getScreenPos(float yaw, float pitch, float partialTicks) {
 		float f = MathHelper.cos(-yaw * 0.017453292F - (float)Math.PI);
 		float f1 = MathHelper.sin(-yaw * 0.017453292F - (float)Math.PI);
 		float f2 = -MathHelper.cos(-pitch * 0.017453292F);
 		float f3 = MathHelper.sin(-pitch * 0.017453292F);
 		Vec3d pos = new Vec3d(f1 * f2, f3, f * f2).scale(5.0D);
+		Entity viewEntity = Minecraft.getMinecraft().getRenderViewEntity();
 
-		if (pos != null) {
-			Entity viewEntity = Minecraft.getMinecraft().getRenderViewEntity();
+		if (viewEntity != null) {
 			double x = pos.xCoord;
 			double y = pos.yCoord;
 			double z = pos.zCoord;
@@ -113,6 +116,7 @@ public class ClientUtils {
 		return null;
 	}
 
+	@Nullable
 	public static Vec3d getScreenCoordsFrom3dCoords(float x, float y, float z) {
 		IntBuffer viewport = BufferUtils.createIntBuffer(16);
 		FloatBuffer modelview = BufferUtils.createFloatBuffer(16);
@@ -132,6 +136,7 @@ public class ClientUtils {
 		}
 	}
 
+	@Nullable
 	public static RayTraceResult getMouseOver(double distance, float partialTicks) {
 		if (distance < 0.0D) {
 			return null;
@@ -177,14 +182,10 @@ public class ClientUtils {
 			}
 
 			float f = 1.0F;
+			Predicate<Entity> predicate = entity -> (entity != null && entity.canBeCollidedWith());
 			List<Entity> list = world.getEntitiesInAABBexcluding(viewEntity,
 					viewEntity.getEntityBoundingBox().addCoord(vec3Look.xCoord * d1, vec3Look.yCoord * d1, vec3Look.zCoord * d1).expand(f, f, f),
-					Predicates.and(EntitySelectors.NOT_SPECTATING, new Predicate<Entity>() {
-						@Override
-						public boolean apply(@Nullable Entity entity) {
-							return entity != null && entity.canBeCollidedWith();
-						}
-					}));
+					Predicates.and(EntitySelectors.NOT_SPECTATING, predicate));
 			double d2 = d1;
 
 			for (Entity entity1 : list) {

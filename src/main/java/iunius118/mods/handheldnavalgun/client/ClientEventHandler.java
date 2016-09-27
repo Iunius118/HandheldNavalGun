@@ -18,7 +18,9 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+@SideOnly(Side.CLIENT)
 public class ClientEventHandler {
+
 	public static final ClientEventHandler INSTANCE = new ClientEventHandler();
 
 	@SubscribeEvent
@@ -30,19 +32,17 @@ public class ClientEventHandler {
 		RangeKeeperGun127mmType89 rangeKeeper = HandheldNavalGun.INSTANCE.rangeKeeper;
 		rangeKeeper.setFuseMax();
 
-		if (rangeKeeper.target != null) {
+		if (rangeKeeper.getTarget() != null) {
 			rangeKeeper.updatetFutureTarget(Minecraft.getMinecraft().theWorld);
 		}
 	}
 
-	@SideOnly(Side.CLIENT)
 	@SubscribeEvent
 	public void onModelBakeEvent(ModelBakeEvent event) {
 		HandheldNavalGunRegistry.registerBakedModels(event);
 		HandheldNavalGunRegistry.registerRenderers();
 	}
 
-	@SideOnly(Side.CLIENT)
 	@SubscribeEvent
 	public void onRenderWorldLastEvent(RenderWorldLastEvent event) {
 		Minecraft mc = Minecraft.getMinecraft();
@@ -62,7 +62,6 @@ public class ClientEventHandler {
 		}
 	}
 
-	@SideOnly(Side.CLIENT)
 	@SubscribeEvent
 	public void onRenderGameOverlayEventPre(RenderGameOverlayEvent.Pre event) {
 		if (event.getType() == ElementType.HOTBAR && Minecraft.getMinecraft().getRenderManager().getFontRenderer() != null) {

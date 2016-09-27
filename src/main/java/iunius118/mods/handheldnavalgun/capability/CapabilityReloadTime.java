@@ -1,5 +1,7 @@
 package iunius118.mods.handheldnavalgun.capability;
 
+import javax.annotation.Nullable;
+
 import iunius118.mods.handheldnavalgun.HandheldNavalGun;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.util.EnumFacing;
@@ -42,14 +44,19 @@ public class CapabilityReloadTime {
 		}
 
 		@Override
-		public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
+		public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
 			return HandheldNavalGun.Capabilities.getReloadTimeICapability() != null && HandheldNavalGun.Capabilities.getReloadTimeICapability() == capability;
 		}
 
 		@Override
-		public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
+		@Nullable
+		public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
 			if (hasCapability(capability, facing)) {
-				return HandheldNavalGun.Capabilities.getReloadTimeICapability().cast(this);
+				Capability<IReloadTimeICapability> reloadTimeICapability = HandheldNavalGun.Capabilities.getReloadTimeICapability();
+
+				if (reloadTimeICapability != null) {
+					return reloadTimeICapability.cast(this);
+				}
 			}
 
 			return null;

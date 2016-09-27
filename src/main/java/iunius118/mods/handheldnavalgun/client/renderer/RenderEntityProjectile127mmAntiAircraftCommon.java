@@ -31,7 +31,7 @@ public class RenderEntityProjectile127mmAntiAircraftCommon<T extends EntityProje
 
 		@Override
 		public Render<? super T> createRenderFor(RenderManager manager) {
-			return new RenderEntityProjectile127mmAntiAircraftCommon(manager);
+			return new RenderEntityProjectile127mmAntiAircraftCommon<EntityProjectile127mmAntiAircraftCommon>(manager);
 		}
 
 	}

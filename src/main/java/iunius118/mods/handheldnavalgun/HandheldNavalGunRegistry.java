@@ -63,7 +63,7 @@ public class HandheldNavalGunRegistry {
 		ForgeHooksClient.registerTESRItemStack(HandheldNavalGun.Items.GUN_127MM_TYPE89_SINGLE, 0, TileEntityItemGun127mmType89Single.class);
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityItemGun127mmType89Single.class, new RenderItemGun127mmType89Single());
 
-		RenderingRegistry.registerEntityRenderingHandler(EntityProjectile127mmAntiAircraftCommon.class, new RenderEntityProjectile127mmAntiAircraftCommon.RenderFactory());
+		RenderingRegistry.registerEntityRenderingHandler(EntityProjectile127mmAntiAircraftCommon.class, new RenderEntityProjectile127mmAntiAircraftCommon.RenderFactory<EntityProjectile127mmAntiAircraftCommon>());
 	}
 
 	@SideOnly(Side.CLIENT)
