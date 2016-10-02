@@ -105,9 +105,9 @@ public class EntityProjectile127mmAntiAircraftCommon extends EntityThrowable {
 			WorldServer world = (WorldServer)this.worldObj;
 
 			if (this.ticksExisted > 3) {
-				world.spawnParticle(EnumParticleTypes.EXPLOSION_HUGE, true, this.posX, this.posY, this.posZ, 1, 0.0D, 0.0D, 0.0D, 0.0D, new int[0]);
+				world.spawnParticle(EnumParticleTypes.EXPLOSION_HUGE, true, result.hitVec.xCoord, result.hitVec.yCoord, result.hitVec.zCoord, 1, 0.0D, 0.0D, 0.0D, 0.0D, new int[0]);
 				world.playSound(null, this.posX, this.posY, this.posZ, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.BLOCKS, 4.0F, (1.0F + (this.worldObj.rand.nextFloat() - this.worldObj.rand.nextFloat()) * 0.2F) * 0.7F);
-				world.createExplosion(this.getThrower(), this.posX, this.posY, this.posZ, this.STRENGTH, false);
+				world.createExplosion(this.getThrower(), result.hitVec.xCoord, result.hitVec.yCoord, result.hitVec.zCoord, this.STRENGTH, false);
 			} else {
 				if (result.typeOfHit == RayTraceResult.Type.ENTITY) {
 					if (result.entityHit instanceof EntityPlayer) {

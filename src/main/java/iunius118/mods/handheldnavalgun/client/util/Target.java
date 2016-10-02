@@ -53,8 +53,8 @@ public class Target {
 		this.worldHashCode = world.hashCode();;
 	}
 
-	public boolean isValid(World world) {
-		if (this.worldHashCode != world.hashCode()) {
+	public boolean isValid(@Nullable World world) {
+		if (world == null || this.worldHashCode != world.hashCode()) {
 			return false;
 		} else if (this.type == Type.ENTITY) {
 			Entity entity = world.getEntityByID(this.entityId);
@@ -68,8 +68,8 @@ public class Target {
 	}
 
 	@Nullable
-	public Vec3d getPos(World world, float partialTicks) {
-		if (this.worldHashCode != world.hashCode()) {
+	public Vec3d getPos(@Nullable World world, float partialTicks) {
+		if (world == null || this.worldHashCode != world.hashCode()) {
 			return null;
 		} else if (this.type == Type.BLOCK) {
 			return this.pos;
@@ -88,8 +88,8 @@ public class Target {
 	}
 
 	@Nullable
-	public Vec3d getDeltaPos(World world) {
-		if (this.worldHashCode != world.hashCode()) {
+	public Vec3d getDeltaPos(@Nullable World world) {
+		if (world == null || this.worldHashCode != world.hashCode()) {
 			return null;
 		} else if (this.type == Type.BLOCK) {
 			return new Vec3d(0.0D, 0.0D, 0.0D);

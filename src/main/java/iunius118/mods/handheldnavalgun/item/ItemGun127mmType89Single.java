@@ -2,6 +2,8 @@ package iunius118.mods.handheldnavalgun.item;
 
 import javax.annotation.Nullable;
 
+import com.google.common.collect.Multimap;
+
 import iunius118.mods.handheldnavalgun.HandheldNavalGun;
 import iunius118.mods.handheldnavalgun.capability.CapabilityReloadTime;
 import iunius118.mods.handheldnavalgun.client.RangeKeeperGun127mmType89;
@@ -12,8 +14,11 @@ import net.minecraft.block.BlockTNT;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
@@ -57,12 +62,11 @@ public class ItemGun127mmType89Single extends Item {
 	}
 
 	public boolean isAmmo(@Nullable ItemStack stack) {
-		return stack != null && stack.getItem() instanceof ItemBlock && ((ItemBlock)stack.getItem()).getBlock() instanceof BlockTNT;
+		return (stack != null) && (stack.getItem() instanceof ItemBlock) && (((ItemBlock)stack.getItem()).getBlock() instanceof BlockTNT);
 	}
 
 	@Override
 	public boolean onEntitySwing(EntityLivingBase entityLiving, ItemStack stack) {
-
 		if (entityLiving.worldObj.isRemote && entityLiving == Minecraft.getMinecraft().thePlayer) {
 			RayTraceResult result = ClientUtils.getMouseOver(256.0D, 1.0F);
 			RangeKeeperGun127mmType89 rangeKeeper = HandheldNavalGun.INSTANCE.rangeKeeper;
@@ -70,15 +74,9 @@ public class ItemGun127mmType89Single extends Item {
 			if (result != null && result.typeOfHit != RayTraceResult.Type.MISS) {
 				double d = result.hitVec.squareDistanceTo(entityLiving.posX, entityLiving.posY, entityLiving.posZ);
 
-				if (d > 100.0D) {
+				if (d > 36.0D) {
 					rangeKeeper.setTarget(new Target(entityLiving.worldObj, result));
 					// System.out.println(result);
-				} else {
-					if (result.typeOfHit == RayTraceResult.Type.BLOCK) {
-						rangeKeeper.setTarget(null);
-					} else {
-						rangeKeeper.setTarget(new Target(entityLiving.worldObj, result));
-					}
 				}
 			} else {
 				rangeKeeper.setTarget(null);
@@ -96,6 +94,11 @@ public class ItemGun127mmType89Single extends Item {
 		if (cap.getReloadTime() == 0 && nbt != null && nbt.getInteger(this.TAG_RELOAD_TIME) == 0) {
 
 			if (!worldIn.isRemote) {	// Server: Shot
+				ItemStack heldItem = playerIn.getHeldItem(EnumHand.MAIN_HAND);
+
+				if (hand == EnumHand.OFF_HAND && (heldItem == null || heldItem.getItem() != this)) {
+					return new ActionResult<>(EnumActionResult.FAIL, itemStackIn);
+				}
 
 				if (!playerIn.capabilities.isCreativeMode) {
 					ItemStack stackAmmo = this.findAmmo(playerIn);
@@ -183,5 +186,16 @@ public class ItemGun127mmType89Single extends Item {
 	 *    +1
 	 *  S(cap= 0, nbt= 0), C(cap= 0 ,nbt= 0) sync NBT and renew Client ItemStack
 	 */
+
+	@Override
+	public Multimap<String, AttributeModifier> getAttributeModifiers(EntityEquipmentSlot slot, ItemStack stack) {
+		Multimap<String, AttributeModifier> multimap = super.getAttributeModifiers(slot, stack);
+
+		if (slot == EntityEquipmentSlot.MAINHAND) {
+			multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getAttributeUnlocalizedName(), new AttributeModifier(this.ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 10.0D, 0));
+		}
+
+		return multimap;
+	}
 
 }
