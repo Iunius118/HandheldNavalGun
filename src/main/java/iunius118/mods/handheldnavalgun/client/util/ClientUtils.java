@@ -14,6 +14,7 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EntitySelectors;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -26,7 +27,13 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class ClientUtils {
-	private static final ClientUtils INSTANCE = new ClientUtils();
+	public static final ClientUtils INSTANCE = new ClientUtils();
+
+	private int tempDisplayWidth = 1;
+	private int tempDisplayHeight = 1;
+	private int tempGuiScale = 1;
+	private int scaleFactor = 1;
+
 	private static double[] v0rate;
 
 	public ClientUtils() {
@@ -130,7 +137,17 @@ public class ClientUtils {
 		boolean result = GLU.gluProject(x, y, z, modelview, projection, viewport, screenCoords);
 
 		if (result) {
-			return new Vec3d(screenCoords.get(0) / 2.0D, (Minecraft.getMinecraft().displayHeight - screenCoords.get(1)) / 2.0D, 0);
+			Minecraft mc = Minecraft.getMinecraft();
+			ClientUtils cu = ClientUtils.INSTANCE;
+
+			if (cu.tempDisplayWidth != mc.displayWidth || cu.tempDisplayHeight != mc.displayHeight || cu.tempGuiScale != mc.gameSettings.guiScale) {
+				cu.scaleFactor = new ScaledResolution(mc).getScaleFactor();
+				cu.tempDisplayWidth = mc.displayWidth;
+				cu.tempDisplayHeight = mc.displayHeight;
+				cu.tempGuiScale = mc.gameSettings.guiScale;
+			}
+
+			return new Vec3d(screenCoords.get(0) / cu.scaleFactor, (mc.displayHeight - screenCoords.get(1)) / cu.scaleFactor, 0);
 		} else {
 			return null;
 		}
