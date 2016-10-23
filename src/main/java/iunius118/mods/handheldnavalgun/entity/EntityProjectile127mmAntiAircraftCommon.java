@@ -1,5 +1,7 @@
 package iunius118.mods.handheldnavalgun.entity;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockTNT;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityThrowable;
@@ -8,13 +10,16 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundCategory;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 
 public class EntityProjectile127mmAntiAircraftCommon extends EntityThrowable {
 
+	public static final int FUSE_SAFETY = 2;
 	public static final int FUSE_MAX = 80;
 	public int fuse = FUSE_MAX;
 	public static final float STRENGTH = 4.0F;
@@ -43,6 +48,16 @@ public class EntityProjectile127mmAntiAircraftCommon extends EntityThrowable {
 	public void setFuse(int ticks) {
 		if (ticks < 0) {
 			this.fuse = 0;
+		} else if (ticks > this.FUSE_MAX) {
+			this.setFuseMax();
+		} else {
+			this.fuse = ticks;
+		}
+	}
+
+	public void setFuseSafety(int ticks) {
+		if (ticks < this.FUSE_SAFETY + 1) {
+			this.fuse = this.FUSE_SAFETY + 1;
 		} else if (ticks > this.FUSE_MAX) {
 			this.setFuseMax();
 		} else {
@@ -85,7 +100,6 @@ public class EntityProjectile127mmAntiAircraftCommon extends EntityThrowable {
 		super.onUpdate();
 
 		this.fuse--;
-
 		//this.printDebugLog();
 
 		if (!this.isDead && (this.fuse < 1 || this.isInWater() || this.isInLava())) {
@@ -104,14 +118,34 @@ public class EntityProjectile127mmAntiAircraftCommon extends EntityThrowable {
 		if (!this.worldObj.isRemote) {
 			WorldServer world = (WorldServer)this.worldObj;
 
-			if (this.ticksExisted > 3) {
+			if (this.ticksExisted > this.FUSE_SAFETY) {
 				world.spawnParticle(EnumParticleTypes.EXPLOSION_HUGE, true, result.hitVec.xCoord, result.hitVec.yCoord, result.hitVec.zCoord, 1, 0.0D, 0.0D, 0.0D, 0.0D, new int[0]);
 				world.playSound(null, this.posX, this.posY, this.posZ, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.BLOCKS, 4.0F, (1.0F + (this.worldObj.rand.nextFloat() - this.worldObj.rand.nextFloat()) * 0.2F) * 0.7F);
-				world.createExplosion(this.getThrower(), result.hitVec.xCoord, result.hitVec.yCoord, result.hitVec.zCoord, this.STRENGTH, false);
+				Explosion explosion = world.createExplosion(this.getThrower(), result.hitVec.xCoord, result.hitVec.yCoord, result.hitVec.zCoord, this.STRENGTH, false);
+				BlockPos posExp = result.getBlockPos();
+
+				if (posExp == null) {
+					posExp = new BlockPos(result.hitVec.xCoord, result.hitVec.yCoord, result.hitVec.zCoord);
+				}
+
+				for (int x = -5; x < 6; x++) {
+					for (int y = -5; y < 6; y++) {
+						for (int z = -5; z < 6; z++) {
+							BlockPos pos = posExp.add(x, y, z);
+							Block block = world.getBlockState(pos).getBlock();
+
+							if (block instanceof BlockTNT) {
+								block.onBlockExploded(world, pos, explosion);
+							}
+						}
+					}
+				}
 			} else {
 				if (result.typeOfHit == RayTraceResult.Type.ENTITY) {
 					if (result.entityHit instanceof EntityPlayer) {
-						result.entityHit.attackEntityFrom(DamageSource.causePlayerDamage((EntityPlayer)this.getThrower()), 40.0F);
+						if (result.entityHit != this.getThrower()) {
+							result.entityHit.attackEntityFrom(DamageSource.causePlayerDamage((EntityPlayer)this.getThrower()), 40.0F);
+						}
 					} else {
 						result.entityHit.attackEntityFrom(DamageSource.causeMobDamage(this.getThrower()), 40.0F);
 					}
