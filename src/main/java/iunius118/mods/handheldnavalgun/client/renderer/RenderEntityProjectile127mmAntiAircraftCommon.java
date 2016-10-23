@@ -42,6 +42,8 @@ public class RenderEntityProjectile127mmAntiAircraftCommon<T extends EntityProje
 
 	@Override
 	public void doRender(T entity, double x, double y, double z, float entityYaw, float partialTicks) {
+		super.doRender(entity, x, y, z, entityYaw, partialTicks);
+
 		Tessellator tessellator = Tessellator.getInstance();
 		VertexBuffer vertexbuffer = tessellator.getBuffer();
 		ItemModelMesher mesher = Minecraft.getMinecraft().getRenderItem().getItemModelMesher();
@@ -59,22 +61,22 @@ public class RenderEntityProjectile127mmAntiAircraftCommon<T extends EntityProje
 
 		// draw faces except bottom
 		for (EnumFacing face : EnumFacing.VALUES) {
-			if (face != EnumFacing.DOWN) {
-				List<BakedQuad> quads =	mesher.getItemModel(new ItemStack(Blocks.STAINED_HARDENED_CLAY, 1 ,EnumDyeColor.RED.getMetadata())).getQuads(null, face, 0L);
-				int size = quads.size();
+			if (face == EnumFacing.DOWN) continue;
 
-				vertexbuffer.begin(GL11.GL_QUADS, DefaultVertexFormats.ITEM);
+			List<BakedQuad> quads = mesher.getItemModel(new ItemStack(Blocks.STAINED_HARDENED_CLAY, 1 ,EnumDyeColor.RED.getMetadata())).getQuads(null, face, 0L);
+			int size = quads.size();
 
-				for (int i = 0; i < size; ++i) {
-					LightUtil.renderQuadColor(vertexbuffer, quads.get(i), -1);
-				}
+			vertexbuffer.begin(GL11.GL_QUADS, DefaultVertexFormats.ITEM);
 
-				tessellator.draw();
+			for (int i = 0; i < size; ++i) {
+				LightUtil.renderQuadColor(vertexbuffer, quads.get(i), -1);
 			}
+
+			tessellator.draw();
 		}
 
 		// draw bottom face (tracer)
-		List<BakedQuad> quads =	mesher.getItemModel(new ItemStack(Blocks.STAINED_HARDENED_CLAY, 1 ,EnumDyeColor.RED.getMetadata())).getQuads(null, EnumFacing.DOWN, 0L);
+		List<BakedQuad> quads = mesher.getItemModel(new ItemStack(Blocks.STAINED_HARDENED_CLAY, 1 ,EnumDyeColor.RED.getMetadata())).getQuads(null, EnumFacing.DOWN, 0L);
 		int size = quads.size();
 
 		GlStateManager.disableLighting();
@@ -95,11 +97,19 @@ public class RenderEntityProjectile127mmAntiAircraftCommon<T extends EntityProje
 		OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, lastBrightnessX, lastBrightnessY);
 		GL11.glPopAttrib();
 
+		// draw tracer point
+		GlStateManager.disableTexture2D();
+
+		GL11.glPointSize(1.5F);
+		vertexbuffer.begin(GL11.GL_POINTS, DefaultVertexFormats.POSITION_COLOR);
+		vertexbuffer.pos(0.5F, -0.1F, 0.5F).color(255, 64, 64, 255).endVertex();
+		tessellator.draw();
+		GL11.glPointSize(1.0F);
+
+		GlStateManager.enableTexture2D();
 		GlStateManager.enableLighting();
 
 		GlStateManager.popMatrix();
-
-		super.doRender(entity, x, y, z, entityYaw, partialTicks);
 	}
 
 	@Override
