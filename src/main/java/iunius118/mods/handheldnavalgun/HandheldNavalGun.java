@@ -5,6 +5,7 @@ import javax.annotation.Nullable;
 import iunius118.mods.handheldnavalgun.capability.CapabilityReloadTime;
 import iunius118.mods.handheldnavalgun.client.ClientEventHandler;
 import iunius118.mods.handheldnavalgun.client.RangeKeeperGun127mmType89;
+import iunius118.mods.handheldnavalgun.client.model.ModelItemGun127mmType89Single;
 import iunius118.mods.handheldnavalgun.item.ItemGun127mmType89Single;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
@@ -43,6 +44,7 @@ public class HandheldNavalGun {
 	public final RangeKeeperGun127mmType89 rangeKeeper = new RangeKeeperGun127mmType89();
 	public Vec3d vec3Target = null;
 	public Vec3d vec3Marker = null;
+	public final ModelItemGun127mmType89Single modelGunPart = new ModelItemGun127mmType89Single();
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event){
@@ -83,13 +85,13 @@ public class HandheldNavalGun {
 	public static class ModelLocations {
 		public static final ModelResourceLocation MRL_ITEM_GUN_127MM_TYPE89_SINGLE = new ModelResourceLocation(HandheldNavalGun.MOD_ID + ":gun_127mm_type89_1", "inventory");
 
-		//public static final ResourceLocation RL_OBJ_ITEM_GUN_127MM_TYPE89_SINGLE = new ResourceLocation(HandheldNavalGun.MOD_ID + ":item/gun_127mm_type89_1.obj");
+		public static final ResourceLocation RL_OBJ_ITEM_GUN_127MM_TYPE89_SINGLE = new ResourceLocation(HandheldNavalGun.MOD_ID + ":item/gun_127mm_type89_1.obj");
 	}
 
 	@SubscribeEvent
 	public void onItemStackLoad(AttachCapabilitiesEvent.Item event) {
 		if (event.getItem() == Items.GUN_127MM_TYPE89_SINGLE) {
-			event.addCapability(new ResourceLocation(MOD_ID, Capabilities.NAME_RELOAD_TIMEI_CAPABILITY), new CapabilityReloadTime.Provider());
+			event.addCapability(new ResourceLocation(HandheldNavalGun.MOD_ID, Capabilities.NAME_RELOAD_TIMEI_CAPABILITY), new CapabilityReloadTime.Provider());
 		}
 	}
 

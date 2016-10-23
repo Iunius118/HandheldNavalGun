@@ -1,0 +1,21 @@
+# Created by Metasequoia
+
+newmtl mat_warship
+Kd 1.00000 1.00000 1.00000
+map_Kd blocks/hardened_clay_stained_cyan
+
+newmtl mat_steel
+Kd 1.00000 1.00000 1.00000
+map_Kd blocks/iron_block
+
+newmtl mat_brass
+Kd 1.00000 1.00000 1.00000
+map_Kd blocks/gold_block
+
+newmtl mat_shell
+Kd 1.00000 1.00000 1.00000
+map_Kd blocks/redstone_block
+
+newmtl mat_crew
+Kd 1.00000 1.00000 1.00000
+map_Kd handheldnavalgun:entity/mob_crew

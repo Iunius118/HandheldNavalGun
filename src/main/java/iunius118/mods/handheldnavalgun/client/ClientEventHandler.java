@@ -13,6 +13,7 @@ import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -35,6 +36,11 @@ public class ClientEventHandler {
 		if (rangeKeeper.getTarget() != null) {
 			rangeKeeper.updatetFutureTarget(Minecraft.getMinecraft().theWorld);
 		}
+	}
+
+	@SubscribeEvent
+	public void onTextureStitchEvent(TextureStitchEvent.Pre event) {
+		HandheldNavalGunRegistry.registerSprites(event);
 	}
 
 	@SubscribeEvent
@@ -103,7 +109,6 @@ public class ClientEventHandler {
 
 			GlStateManager.enableTexture2D();
 			GlStateManager.enableDepth();
-
 		}
 	}
 }
