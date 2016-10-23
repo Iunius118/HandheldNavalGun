@@ -79,9 +79,9 @@ public class RangeKeeperGun127mmType89 {
 		}
 
 		Vec3d vec3Target1 = this.target.getPos(world, 2.0F);
-		Vec3d vec3DeltaTarget = this.target.getDeltaPos(world);
+		Vec3d vec3TargetDelta = this.target.getPosDelta(world);
 
-		if (vec3Target1 == null || vec3DeltaTarget == null) {
+		if (vec3Target1 == null || vec3TargetDelta == null) {
 			return setIsValid(false);
 		}
 
@@ -104,7 +104,7 @@ public class RangeKeeperGun127mmType89 {
 				break;
 			}
 
-			vec3Target1 = vec3Target1.add(vec3DeltaTarget);
+			vec3Target1 = vec3Target1.add(vec3TargetDelta);
 		}
 
 		double x1 = vec3Target1.xCoord - vec3Player.xCoord;
@@ -116,7 +116,7 @@ public class RangeKeeperGun127mmType89 {
 		double v0sq1 = v0x1 * v0x1 + v0y1 * v0y1;
 
 		for (; t <= EntityProjectile127mmAntiAircraftCommon.FUSE_MAX; t++) {
-			Vec3d vec3Target2 = vec3Target1.add(vec3DeltaTarget);
+			Vec3d vec3Target2 = vec3Target1.add(vec3TargetDelta);
 			double x2 = vec3Target2.xCoord - vec3Player.xCoord;
 			double z2 = vec3Target2.zCoord - vec3Player.zCoord;
 			double tx2 = Math.sqrt(x2 * x2 + z2 * z2);
@@ -127,20 +127,19 @@ public class RangeKeeperGun127mmType89 {
 
 			if ((v0sq1 > v0sq2 && v0sq1 >= v0sq && v0sq2 < v0sq) || (v0sq1 < v0sq2 && v0sq1 < v0sq && v0sq2 >= v0sq)) {
 				if (Math.abs(v0sq1 - v0sq) <= Math.abs(v0sq2 - v0sq)) {
-					this.ticksFuse = t;
 					this.futureYaw = (tx1 != 0.0D) ? Math.toDegrees(Math.atan2(- vec3Target1.xCoord + vec3Player.xCoord, vec3Target1.zCoord - vec3Player.zCoord)) : 0.0D;
 					this.futurePitch = -Math.toDegrees(Math.atan2(v0y1, v0x1));
-					return setIsValid(true);
 				} else {
 					if (t < EntityProjectile127mmAntiAircraftCommon.FUSE_MAX) {
 						t++;
 					}
 
-					this.ticksFuse = t;
 					this.futureYaw = (tx2 != 0.0D) ? Math.toDegrees(Math.atan2(- vec3Target2.xCoord + vec3Player.xCoord, vec3Target2.zCoord - vec3Player.zCoord)) : 0.0D;
 					this.futurePitch = -Math.toDegrees(Math.atan2(v0y2, v0x2));
-					return setIsValid(true);
 				}
+
+				this.ticksFuse = t;
+				return setIsValid(t > EntityProjectile127mmAntiAircraftCommon.FUSE_SAFETY);
 			}
 
 			vec3Target1 = vec3Target2;

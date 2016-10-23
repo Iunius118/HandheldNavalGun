@@ -88,7 +88,7 @@ public class Target {
 	}
 
 	@Nullable
-	public Vec3d getDeltaPos(@Nullable World world) {
+	public Vec3d getPosDelta(@Nullable World world) {
 		if (world == null || this.worldHashCode != world.hashCode()) {
 			return null;
 		} else if (this.type == Type.BLOCK) {

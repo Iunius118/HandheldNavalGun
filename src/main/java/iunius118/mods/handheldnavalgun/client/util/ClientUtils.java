@@ -102,8 +102,9 @@ public class ClientUtils {
 			double x = pos.xCoord;
 			double y = pos.yCoord;
 			double z = pos.zCoord;
+			double lenSq = x * x + y * y + z * z;
 
-			if (x == 0.0D && y == 0.0D && z == 0.0D) {
+			if (lenSq < 1e-8) {
 				return null;
 			}
 
@@ -113,7 +114,7 @@ public class ClientUtils {
 				look = look.scale(-1);
 			}
 
-			double deg = Math.toDegrees(Math.acos((x * look.xCoord + y * look.yCoord + z * look.zCoord) / (Math.sqrt(x * x + y * y + z * z) * look.lengthVector())));
+			double deg = Math.toDegrees(Math.acos((x * look.xCoord + y * look.yCoord + z * look.zCoord) / (Math.sqrt(lenSq) * look.lengthVector())));
 
 			if (deg < 90) {
 				return ClientUtils.getScreenCoordsFrom3dCoords((float)x, (float)y + viewEntity.getEyeHeight(), (float)z);

@@ -120,9 +120,7 @@ public class ItemGun127mmType89Single extends Item {
 				RangeKeeperGun127mmType89 rangeKeeper = HandheldNavalGun.INSTANCE.rangeKeeper;
 
 				if (rangeKeeper.isValid()) {
-					if (rangeKeeper.getFuse() > 3) {
-						entity.setFuse(rangeKeeper.getFuse());
-					}
+					entity.setFuseSafety(rangeKeeper.getFuse());
 				}
 
 				playerIn.worldObj.spawnEntityInWorld(entity);
