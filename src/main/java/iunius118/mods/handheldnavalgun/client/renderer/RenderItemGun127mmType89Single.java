@@ -32,6 +32,7 @@ public class RenderItemGun127mmType89Single extends TileEntitySpecialRenderer<Ti
 
 		public TransformType transformTypeCamera;
 		public int reloadTick;
+		public boolean isThePlayer;
 		public boolean isFirstPersonView;
 		public boolean isThirdPersonView;
 		public boolean isLeftHand;
@@ -45,7 +46,14 @@ public class RenderItemGun127mmType89Single extends TileEntitySpecialRenderer<Ti
 				this.reloadTick = 0;
 			}
 
-			this.playerPitch = entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * Animation.getPartialTickTime();
+			if (entity != null) {
+				this.playerPitch = entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * Animation.getPartialTickTime();
+				this.isThePlayer = (Minecraft.getMinecraft().thePlayer == entity);
+			} else {
+				this.playerPitch = 0;
+				this.isThePlayer = false;
+			}
+
 			this.transformTypeCamera = cameraTransformType;
 			this.isFirstPersonView = false;
 			this.isThirdPersonView = false;

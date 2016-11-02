@@ -70,6 +70,10 @@ public class RangeKeeperGun127mmType89 {
 		return null;
 	}
 
+	/*
+	 * Compute future target direction from the player and fuse time
+	 * 	for EntityThrowable (gravity velocity: 0.03, attenuation rate: 0.99) initial velocity of 4 m/ticks
+	 * */
 	public boolean updatetFutureTarget(World world) {
 		this.prevFutureYaw = this.futureYaw;
 		this.prevFuturePitch = this.futurePitch;
@@ -94,8 +98,9 @@ public class RangeKeeperGun127mmType89 {
 		Vec3d vec3Player = new Vec3d(player.posX, player.posY + player.getEyeHeight(), player.posZ);
 		final double v0sq = EntityProjectile127mmAntiAircraftCommon.INITIAL_VELOCITY * EntityProjectile127mmAntiAircraftCommon.INITIAL_VELOCITY;
 
-		int t;
+		int t;	// Fuse tick to set
 
+		// Skip tick by distance
 		for (t = 1; t <= EntityProjectile127mmAntiAircraftCommon.FUSE_MAX; t++) {
 			double r = vec3Player.distanceTo(vec3Target1);
 			int ts = (int)Math.floor(0.00007D * r * r + 0.25D * r - 0.04D);
@@ -107,6 +112,7 @@ public class RangeKeeperGun127mmType89 {
 			vec3Target1 = vec3Target1.add(vec3TargetDelta);
 		}
 
+		// Calculate initial velocity from tick, height and distance
 		double x1 = vec3Target1.xCoord - vec3Player.xCoord;
 		double z1 = vec3Target1.zCoord - vec3Player.zCoord;
 		double tx1 = Math.sqrt(x1 * x1 + z1 * z1);
@@ -116,6 +122,7 @@ public class RangeKeeperGun127mmType89 {
 		double v0sq1 = v0x1 * v0x1 + v0y1 * v0y1;
 
 		for (; t <= EntityProjectile127mmAntiAircraftCommon.FUSE_MAX; t++) {
+			// Calculate initial velocity from tick + 1, height and distance
 			Vec3d vec3Target2 = vec3Target1.add(vec3TargetDelta);
 			double x2 = vec3Target2.xCoord - vec3Player.xCoord;
 			double z2 = vec3Target2.zCoord - vec3Player.zCoord;
@@ -125,6 +132,7 @@ public class RangeKeeperGun127mmType89 {
 			double v0y2 = (ty2 + 3.0D * (t + 1)) / ClientUtils.ticksToV0Rate(t + 1) - 3.0D;
 			double v0sq2 = v0x2 * v0x2 + v0y2 * v0y2;
 
+			// If calculated initial velocity is closest to the real velocity (4 m/ticks), update the tick and the future target direction from the player, and return
 			if ((v0sq1 > v0sq2 && v0sq1 >= v0sq && v0sq2 < v0sq) || (v0sq1 < v0sq2 && v0sq1 < v0sq && v0sq2 >= v0sq)) {
 				if (Math.abs(v0sq1 - v0sq) <= Math.abs(v0sq2 - v0sq)) {
 					this.futureYaw = (tx1 != 0.0D) ? Math.toDegrees(Math.atan2(- vec3Target1.xCoord + vec3Player.xCoord, vec3Target1.zCoord - vec3Player.zCoord)) : 0.0D;
@@ -142,6 +150,7 @@ public class RangeKeeperGun127mmType89 {
 				return setIsValid(t > EntityProjectile127mmAntiAircraftCommon.FUSE_SAFETY);
 			}
 
+			// Tick progress
 			vec3Target1 = vec3Target2;
 			tx1 = tx2;
 			ty1 = ty2;
@@ -150,6 +159,7 @@ public class RangeKeeperGun127mmType89 {
 			v0sq1 = v0sq2;
 		}
 
+		// Out of range
 		return setIsValid(false);
 	}
 

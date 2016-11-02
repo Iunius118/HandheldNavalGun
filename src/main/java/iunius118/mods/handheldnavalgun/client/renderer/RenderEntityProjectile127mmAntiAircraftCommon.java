@@ -22,21 +22,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.pipeline.LightUtil;
-import net.minecraftforge.fml.client.registry.IRenderFactory;
 
 
 public class RenderEntityProjectile127mmAntiAircraftCommon<T extends EntityProjectile127mmAntiAircraftCommon> extends Render<T> {
 
-	public static class RenderFactory<T extends EntityProjectile127mmAntiAircraftCommon>  implements IRenderFactory<T> {
-
-		@Override
-		public Render<? super T> createRenderFor(RenderManager manager) {
-			return new RenderEntityProjectile127mmAntiAircraftCommon<EntityProjectile127mmAntiAircraftCommon>(manager);
-		}
-
-	}
-
-	protected RenderEntityProjectile127mmAntiAircraftCommon(RenderManager renderManager) {
+	public RenderEntityProjectile127mmAntiAircraftCommon(RenderManager renderManager) {
 		super(renderManager);
 	}
 
