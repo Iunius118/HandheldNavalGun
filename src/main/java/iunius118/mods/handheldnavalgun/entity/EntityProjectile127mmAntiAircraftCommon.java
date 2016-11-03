@@ -3,9 +3,12 @@ package iunius118.mods.handheldnavalgun.entity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockTNT;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityThrowable;
+import net.minecraft.init.Items;
 import net.minecraft.init.SoundEvents;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumParticleTypes;
@@ -154,6 +157,12 @@ public class EntityProjectile127mmAntiAircraftCommon extends EntityThrowable {
 						result.entityHit.attackEntityFrom(DamageSource.causeMobDamage(this.getThrower()), 40.0F);
 					}
 				}
+			}
+
+			// drop shell wreckage
+			if (this.getThrower() instanceof EntityPlayer && !((EntityPlayer)this.getThrower()).capabilities.isCreativeMode) {
+				EntityItem entityitem = new EntityItem(world, result.hitVec.xCoord, result.hitVec.yCoord, result.hitVec.zCoord, new ItemStack(Items.IRON_INGOT));
+				world.spawnEntityInWorld(entityitem);
 			}
 		}
 

@@ -10,17 +10,16 @@ import iunius118.mods.handheldnavalgun.client.RangeKeeperGun127mmType89;
 import iunius118.mods.handheldnavalgun.client.util.ClientUtils;
 import iunius118.mods.handheldnavalgun.client.util.Target;
 import iunius118.mods.handheldnavalgun.entity.EntityProjectile127mmAntiAircraftCommon;
-import net.minecraft.block.BlockTNT;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ActionResult;
@@ -64,7 +63,7 @@ public class ItemGun127mmType89Single extends Item {
 	}
 
 	public boolean isAmmo(@Nullable ItemStack stack) {
-		return (stack != null) && (stack.getItem() instanceof ItemBlock) && (((ItemBlock)stack.getItem()).getBlock() instanceof BlockTNT);
+		return (stack != null) && (stack.getItem() == HandheldNavalGun.Items.ROUND_127MM_TYPE0_AAC);
 	}
 
 	@Override
@@ -119,6 +118,10 @@ public class ItemGun127mmType89Single extends Item {
 						if (stackAmmo.stackSize <= 0) {
 							playerIn.inventory.deleteStack(stackAmmo);
 						}
+
+						// drop empty cartridge
+						EntityItem entityitem = new EntityItem(worldIn, playerIn.posX, playerIn.posY + 0.5, playerIn.posZ, new ItemStack(HandheldNavalGun.INSTANCE.itemCartridge));
+						worldIn.spawnEntityInWorld(entityitem);
 					}
 				}
 

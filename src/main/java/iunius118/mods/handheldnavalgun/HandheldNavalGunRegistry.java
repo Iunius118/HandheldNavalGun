@@ -12,6 +12,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -48,6 +49,7 @@ public class HandheldNavalGunRegistry {
 
 	public static void registerItems() {
 		GameRegistry.register(HandheldNavalGun.Items.GUN_127MM_TYPE89_SINGLE);
+		GameRegistry.register(HandheldNavalGun.Items.ROUND_127MM_TYPE0_AAC);
 		registerItemRecipes();
 	}
 
@@ -55,20 +57,43 @@ public class HandheldNavalGunRegistry {
 		GameRegistry.addRecipe(
 				new ShapedOreRecipe(
 						new ItemStack(HandheldNavalGun.Items.GUN_127MM_TYPE89_SINGLE),
-						" i ",
-						"isi",
-						"grc",
+						"ii ",
+						"gii",
+						"cS ",
 						'i', "ingotIron",
-						's', "slimeball",
 						'g', "paneGlass",
-						'r', "dustRedstone",
-						'c', Items.CLOCK)
+						'c', Items.CLOCK,
+						'S', Blocks.STICKY_PISTON)
+				);
+
+		GameRegistry.addRecipe(
+				new ShapedOreRecipe(
+						new ItemStack(HandheldNavalGun.Items.ROUND_127MM_TYPE0_AAC, 16),
+						" c ",
+						"ITI",
+						"ITI",
+						'c', Items.CLOCK,
+						'I', "blockIron",
+						'T', Blocks.TNT)
+				);
+
+		GameRegistry.addRecipe(
+				new ShapedOreRecipe(
+						new ItemStack(HandheldNavalGun.Items.ROUND_127MM_TYPE0_AAC, 16),
+						" c ",
+						"STS",
+						"BTB",
+						'c', Items.CLOCK,
+						'S', "blockSteel",
+						'B', "blockBrass",
+						'T', Blocks.TNT)
 				);
 	}
 
 	@SideOnly(Side.CLIENT)
 	public static void registerItemModels() {
 		ModelLoader.setCustomModelResourceLocation(HandheldNavalGun.Items.GUN_127MM_TYPE89_SINGLE, 0, HandheldNavalGun.ModelLocations.MRL_ITEM_GUN_127MM_TYPE89_SINGLE);
+		ModelLoader.setCustomModelResourceLocation(HandheldNavalGun.Items.ROUND_127MM_TYPE0_AAC, 0, HandheldNavalGun.ModelLocations.MRL_ITEM_ROUND_127MM_TYPE0_AAC);
 	}
 
 	@SideOnly(Side.CLIENT)
