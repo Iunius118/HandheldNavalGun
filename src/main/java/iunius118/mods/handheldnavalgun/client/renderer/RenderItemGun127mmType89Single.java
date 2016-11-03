@@ -10,7 +10,10 @@ import net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformT
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.world.World;
 import net.minecraftforge.client.model.animation.Animation;
+import net.minecraftforge.common.util.Constants.NBT;
 
 public class RenderItemGun127mmType89Single extends TileEntitySpecialRenderer<TileEntityItemGun127mmType89Single> {
 
@@ -37,6 +40,7 @@ public class RenderItemGun127mmType89Single extends TileEntitySpecialRenderer<Ti
 		public boolean isThirdPersonView;
 		public boolean isLeftHand;
 		public float playerPitch;
+		public ItemStack stack;
 
 		public RenderContext(ItemStack item, EntityLivingBase entity, TransformType cameraTransformType) {
 			if (item != null) {
@@ -54,6 +58,7 @@ public class RenderItemGun127mmType89Single extends TileEntitySpecialRenderer<Ti
 				this.isThePlayer = false;
 			}
 
+			this.stack = item;
 			this.transformTypeCamera = cameraTransformType;
 			this.isFirstPersonView = false;
 			this.isThirdPersonView = false;
@@ -75,6 +80,50 @@ public class RenderItemGun127mmType89Single extends TileEntitySpecialRenderer<Ti
 			default:
 				break;
 			}
+		}
+
+		public boolean isBlinkingA() {
+			World world = Minecraft.getMinecraft().theWorld;
+			if (stack != null && stack.hasTagCompound()) {
+				NBTTagCompound tag = stack.getTagCompound();
+				long time = world.getTotalWorldTime();
+
+				if (tag.hasKey("blink1", NBT.TAG_LONG)) {
+					long blink = tag.getLong("blink1");
+
+					if (blink < time) {
+						tag.setLong("blink1", time + world.rand.nextInt(120) + 21);
+					} else if (blink == time) {
+						return true;
+					}
+				} else {
+					tag.setLong("blink1", time + world.rand.nextInt(120) + 21);
+				}
+			}
+
+			return false;
+		}
+
+		public boolean isBlinkingB() {
+			World world = Minecraft.getMinecraft().theWorld;
+			if (stack != null && stack.hasTagCompound()) {
+				NBTTagCompound tag = stack.getTagCompound();
+				long time = world.getTotalWorldTime();
+
+				if (tag.hasKey("blink2", NBT.TAG_LONG)) {
+					long blink = tag.getLong("blink2");
+
+					if (blink < time) {
+						tag.setLong("blink2", time + world.rand.nextInt(120) + 21);
+					} else if (blink == time) {
+						return true;
+					}
+				} else {
+					tag.setLong("blink2", time + world.rand.nextInt(120) + 21);
+				}
+			}
+
+			return false;
 		}
 
 	}

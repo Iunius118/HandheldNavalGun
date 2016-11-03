@@ -25,6 +25,10 @@ public class EntityProjectile127mmAntiAircraftCommon extends EntityThrowable {
 	public static final float STRENGTH = 4.0F;
 	public static final float INITIAL_VELOCITY = 4.0F;
 	public static final float INACCURACY = 1.0F;
+
+	public static final String TAG_FUSE = "fuse";
+	public static final String TAG_TICKS_EXISTED = "age";
+
 	public float spin = 0.0F;
 
 	public EntityProjectile127mmAntiAircraftCommon(World worldIn, EntityLivingBase throwerIn, int fuseTicks) {
@@ -159,15 +163,15 @@ public class EntityProjectile127mmAntiAircraftCommon extends EntityThrowable {
 	@Override
 	public void writeEntityToNBT(NBTTagCompound compound) {
 		super.writeEntityToNBT(compound);
-		compound.setInteger("fuse", this.fuse);
-		compound.setInteger("age", this.ticksExisted);
+		compound.setInteger(this.TAG_FUSE, this.fuse);
+		compound.setInteger(this.TAG_TICKS_EXISTED, this.ticksExisted);
 	}
 
 	@Override
 	public void readEntityFromNBT(NBTTagCompound compound) {
 		super.readEntityFromNBT(compound);
-		this.setFuse(compound.getInteger("fuse"));
-		this.ticksExisted = compound.getInteger("age");
+		this.setFuse(compound.getInteger(this.TAG_FUSE));
+		this.ticksExisted = compound.getInteger(this.TAG_TICKS_EXISTED);
 	}
 
 	@Override

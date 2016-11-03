@@ -28,6 +28,7 @@ import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundCategory;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -35,6 +36,7 @@ import net.minecraft.world.WorldServer;
 
 public class ItemGun127mmType89Single extends Item {
 
+	public static final String TAG_UNIQUE_ID = "UUID";
 	public static final String TAG_RELOAD_TIME = "reload";
 	public static final int RELOAD_TIME = 80;
 
@@ -71,14 +73,20 @@ public class ItemGun127mmType89Single extends Item {
 			RayTraceResult result = ClientUtils.getMouseOver(256.0D, 1.0F);
 			RangeKeeperGun127mmType89 rangeKeeper = HandheldNavalGun.INSTANCE.rangeKeeper;
 
-			if (result != null && result.typeOfHit != RayTraceResult.Type.MISS) {
+			if (Minecraft.getMinecraft().thePlayer.isSneaking()) {
+				// if sneaking, release target
+				rangeKeeper.setTarget(null);
+			} else if (result != null && result.typeOfHit != RayTraceResult.Type.MISS) {
+				// set target to range-keeper
 				double d = result.hitVec.squareDistanceTo(entityLiving.posX, entityLiving.posY, entityLiving.posZ);
 
 				if (d > 36.0D) {
+					// targeting only over some distance
 					rangeKeeper.setTarget(new Target(entityLiving.worldObj, result));
 					// System.out.println(result);
 				}
 			} else {
+				// the other case: release target
 				rangeKeeper.setTarget(null);
 			}
 		}
@@ -165,7 +173,9 @@ public class ItemGun127mmType89Single extends Item {
 				}
 			}
 		} else {
-			stack.setTagCompound(new NBTTagCompound());
+			NBTTagCompound tag = new NBTTagCompound();
+			tag.setUniqueId(this.TAG_UNIQUE_ID, MathHelper.getRandomUuid(worldIn.rand));
+			stack.setTagCompound(tag);
 		}
 
 	}
@@ -181,9 +191,38 @@ public class ItemGun127mmType89Single extends Item {
 	 *   +78
 	 *  S(cap= 1, nbt=80), C(cap= 2, nbt= 0) at onUpdate
 	 *  S(cap= 1, nbt= 0), C(cap= 2, nbt= 0) update Server NBT at onUpdate
-	 *    +1
+	 *   +1
 	 *  S(cap= 0, nbt= 0), C(cap= 0 ,nbt= 0) sync NBT and renew Client ItemStack
 	 */
+
+	/*
+	// show reload progress by durability bar
+	@Override
+	public boolean showDurabilityBar(ItemStack stack) {
+		CapabilityReloadTime.IReloadTimeICapability cap = stack.getCapability(HandheldNavalGun.Capabilities.getReloadTimeICapability(), null);
+		return (cap.getReloadTime() > 0);
+	}
+
+	@Override
+	public double getDurabilityForDisplay(ItemStack stack) {
+		CapabilityReloadTime.IReloadTimeICapability cap = stack.getCapability(HandheldNavalGun.Capabilities.getReloadTimeICapability(), null);
+		return (double)cap.getReloadTime() / this.RELOAD_TIME;
+	}
+	// */
+
+	public boolean compareUUIDFromItemStack(ItemStack stackA, ItemStack stackB) {
+		if (stackA.hasTagCompound() && stackB.hasTagCompound()) {
+			NBTTagCompound tagA = stackA.getTagCompound();
+			NBTTagCompound tagB = stackB.getTagCompound();
+
+			if (tagA.hasUniqueId("UUID") && tagB.hasUniqueId("UUID")) {
+				boolean ret = tagA.getUniqueId("UUID").equals(tagB.getUniqueId("UUID"));
+				return ret;
+			}
+		}
+
+		return false;
+	}
 
 	@Override
 	public Multimap<String, AttributeModifier> getAttributeModifiers(EntityEquipmentSlot slot, ItemStack stack) {

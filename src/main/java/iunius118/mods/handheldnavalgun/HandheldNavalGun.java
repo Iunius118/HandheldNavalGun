@@ -90,7 +90,7 @@ public class HandheldNavalGun {
 
 	@SubscribeEvent
 	public void onItemStackLoad(AttachCapabilitiesEvent.Item event) {
-		if (event.getItem() == Items.GUN_127MM_TYPE89_SINGLE) {
+		if (event.getItem() instanceof ItemGun127mmType89Single) {
 			event.addCapability(new ResourceLocation(HandheldNavalGun.MOD_ID, Capabilities.NAME_RELOAD_TIMEI_CAPABILITY), new CapabilityReloadTime.Provider());
 		}
 	}
