@@ -1,37 +1,15 @@
 package iunius118.mods.handheldnavalgun.client.model;
 
 import java.util.Collections;
-import java.util.List;
-import java.util.function.Consumer;
 
-import javax.annotation.Nullable;
-
-import org.apache.commons.lang3.tuple.Pair;
-import org.lwjgl.opengl.GL11;
-
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.UnmodifiableIterator;
 
-import iunius118.mods.handheldnavalgun.client.renderer.RenderItemGun127mmType89Single;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.client.model.animation.Animation;
 import net.minecraftforge.client.model.obj.OBJModel;
-import net.minecraftforge.client.model.pipeline.LightUtil;
-import net.minecraftforge.common.model.IModelState;
-import net.minecraftforge.common.model.Models;
-import net.minecraftforge.common.model.TRSRTransformation;
 
 public class ModelItemGun127mmType89Single {
 
@@ -80,44 +58,44 @@ public class ModelItemGun127mmType89Single {
 
 	public void registerModel(OBJModel obj) {
 		// Register Model Parts
-		this.handle	= new ModelPartRenderer(this.getPartQuads(obj, ImmutableList.of("Handle")), "handle", 0, -0.09375, 0);
-		this.turret	= new ModelPartRenderer(this.getPartQuads(obj, ImmutableList.of("Turret")), "turret", 0, 0, 0);
-		this.slide 	= new ModelPartRenderer(this.getPartQuads(obj, ImmutableList.of("Slide")), "slide", 0, 0.234375, 0.03125);
-		this.platform	= new ModelPartRenderer(this.getPartQuads(obj, ImmutableList.of("Platform")), "platform", 0.078125, 0.265625, 0.0625);
-		this.rammer	= new ModelPartRenderer(this.getPartQuads(obj, ImmutableList.of("Rammer")), "rammer", -0.03125, 0.21875, 0.1875);
-		this.tray  	= new ModelPartRenderer(this.getPartQuads(obj, ImmutableList.of("Tray")), "tray", 0.03125, 0.203125, 0.125);
-		this.cartridge	= new ModelPartRenderer(this.getPartQuads(obj, ImmutableList.of("Cartridge")), "cartridge", 0.03125, 0.203125, 0.125);
-		this.shell 	= new ModelPartRenderer(this.getPartQuads(obj, ImmutableList.of("Shell")), "shell", 0.03125, 0.203125, 0.125);
-		this.gun   	= new ModelPartRenderer(this.getPartQuads(obj, ImmutableList.of("Gun")), "gun", 0, 0.234375, 0.03125);
-		this.breech	= new ModelPartRenderer(this.getPartQuads(obj, ImmutableList.of("Breech")), "breech", 0, 0.234375, 0.109375);
+		this.handle	= new ModelPartRenderer(ModelPartRenderer.getPartQuads(obj, ImmutableList.of("Handle")), "handle", 0, -0.09375, 0);
+		this.turret	= new ModelPartRenderer(ModelPartRenderer.getPartQuads(obj, ImmutableList.of("Turret")), "turret", 0, 0, 0);
+		this.slide 	= new ModelPartRenderer(ModelPartRenderer.getPartQuads(obj, ImmutableList.of("Slide")), "slide", 0, 0.234375, 0.03125);
+		this.platform	= new ModelPartRenderer(ModelPartRenderer.getPartQuads(obj, ImmutableList.of("Platform")), "platform", 0.078125, 0.265625, 0.0625);
+		this.rammer	= new ModelPartRenderer(ModelPartRenderer.getPartQuads(obj, ImmutableList.of("Rammer")), "rammer", -0.03125, 0.21875, 0.1875);
+		this.tray  	= new ModelPartRenderer(ModelPartRenderer.getPartQuads(obj, ImmutableList.of("Tray")), "tray", 0.03125, 0.203125, 0.125);
+		this.cartridge	= new ModelPartRenderer(ModelPartRenderer.getPartQuads(obj, ImmutableList.of("Cartridge")), "cartridge", 0.03125, 0.203125, 0.125);
+		this.shell 	= new ModelPartRenderer(ModelPartRenderer.getPartQuads(obj, ImmutableList.of("Shell")), "shell", 0.03125, 0.203125, 0.125);
+		this.gun   	= new ModelPartRenderer(ModelPartRenderer.getPartQuads(obj, ImmutableList.of("Gun")), "gun", 0, 0.234375, 0.03125);
+		this.breech	= new ModelPartRenderer(ModelPartRenderer.getPartQuads(obj, ImmutableList.of("Breech")), "breech", 0, 0.234375, 0.109375);
 
 		this.crew1	= new ModelPartRenderer(null, "crew1", -0.125, 0.125, 0.015625);
-		this.skirt1	= new ModelPartRenderer(this.getPartQuads(obj, ImmutableList.of("Skirt1")), "skirt1", -0.125, 0.125, 0.015625);
-		this.legL1	= new ModelPartRenderer(this.getPartQuads(obj, ImmutableList.of("LegLeft1")), "legL1", -0.1328125, 0.170625, 0.015625);
-		this.legR1	= new ModelPartRenderer(this.getPartQuads(obj, ImmutableList.of("LegRight1")), "legR1", -0.1171875, 0.170625, 0.015625);
-		this.body1	= new ModelPartRenderer(this.getPartQuads(obj, ImmutableList.of("Body1")), "body1", -0.125, 0.170625, 0.015625);
-		this.armL1	= new ModelPartRenderer(this.getPartQuads(obj, ImmutableList.of("ArmLeft1")), "armL1", -0.1455, 0.2011715, 0.015625);
-		this.armR1	= new ModelPartRenderer(this.getPartQuads(obj, ImmutableList.of("ArmRight1")), "armR1", -0.1047, 0.2011715, 0.015625);
-		this.head1	= new ModelPartRenderer(this.getPartQuads(obj, ImmutableList.of("Head1", "Hair1", "ChignonBack1", "ChignonLeft1", "ChignonRight1")), "head1", -0.125, 0.20625, 0.015625);
-		this.eyeL1	= new ModelPartRenderer(this.getPartQuads(obj, ImmutableList.of("EyeLaft1")), "eyeL1", -0.125, 0.20625, 0.015625);
-		this.eyeR1	= new ModelPartRenderer(this.getPartQuads(obj, ImmutableList.of("EyeRight1")), "eyeR1", -0.125, 0.20625, 0.015625);
-		this.tailB1	= new ModelPartRenderer(this.getPartQuads(obj, ImmutableList.of("Ponytail1")), "tailB1", -0.125, 0.23265, 0.04625);
-		this.tailL1	= new ModelPartRenderer(this.getPartQuads(obj, ImmutableList.of("SidetailLeft1")), "tailL1", -0.15, 0.23265, 0.025);
-		this.tailR1	= new ModelPartRenderer(this.getPartQuads(obj, ImmutableList.of("SidetailRight1")), "tailR1", -0.1, 0.23265, 0.025);
+		this.skirt1	= new ModelPartRenderer(ModelPartRenderer.getPartQuads(obj, ImmutableList.of("Skirt1")), "skirt1", -0.125, 0.125, 0.015625);
+		this.legL1	= new ModelPartRenderer(ModelPartRenderer.getPartQuads(obj, ImmutableList.of("LegLeft1")), "legL1", -0.1328125, 0.170625, 0.015625);
+		this.legR1	= new ModelPartRenderer(ModelPartRenderer.getPartQuads(obj, ImmutableList.of("LegRight1")), "legR1", -0.1171875, 0.170625, 0.015625);
+		this.body1	= new ModelPartRenderer(ModelPartRenderer.getPartQuads(obj, ImmutableList.of("Body1")), "body1", -0.125, 0.170625, 0.015625);
+		this.armL1	= new ModelPartRenderer(ModelPartRenderer.getPartQuads(obj, ImmutableList.of("ArmLeft1")), "armL1", -0.1455, 0.2011715, 0.015625);
+		this.armR1	= new ModelPartRenderer(ModelPartRenderer.getPartQuads(obj, ImmutableList.of("ArmRight1")), "armR1", -0.1047, 0.2011715, 0.015625);
+		this.head1	= new ModelPartRenderer(ModelPartRenderer.getPartQuads(obj, ImmutableList.of("Head1", "Hair1", "ChignonBack1", "ChignonLeft1", "ChignonRight1")), "head1", -0.125, 0.20625, 0.015625);
+		this.eyeL1	= new ModelPartRenderer(ModelPartRenderer.getPartQuads(obj, ImmutableList.of("EyeLaft1")), "eyeL1", -0.125, 0.20625, 0.015625);
+		this.eyeR1	= new ModelPartRenderer(ModelPartRenderer.getPartQuads(obj, ImmutableList.of("EyeRight1")), "eyeR1", -0.125, 0.20625, 0.015625);
+		this.tailB1	= new ModelPartRenderer(ModelPartRenderer.getPartQuads(obj, ImmutableList.of("Ponytail1")), "tailB1", -0.125, 0.23265, 0.04625);
+		this.tailL1	= new ModelPartRenderer(ModelPartRenderer.getPartQuads(obj, ImmutableList.of("SidetailLeft1")), "tailL1", -0.15, 0.23265, 0.025);
+		this.tailR1	= new ModelPartRenderer(ModelPartRenderer.getPartQuads(obj, ImmutableList.of("SidetailRight1")), "tailR1", -0.1, 0.23265, 0.025);
 
 		this.crew2	= new ModelPartRenderer(null, "crew2", 0.109375, 0.15625, 0.15625);
-		this.skirt2	= new ModelPartRenderer(this.getPartQuads(obj, ImmutableList.of("Skirt2")), "skirt2", 0.109375, 0.2125, 0.15625);
-		this.legL2	= new ModelPartRenderer(this.getPartQuads(obj, ImmutableList.of("LegLeft2")), "legL2", 0.109375, 0.201875, 0.1640625);
-		this.legR2	= new ModelPartRenderer(this.getPartQuads(obj, ImmutableList.of("LegRight2")), "legR2", 0.109375, 0.201875, 0.1484375);
-		this.body2	= new ModelPartRenderer(this.getPartQuads(obj, ImmutableList.of("Body2")), "body2", 0.109375, 0.201875, 0.15625);
-		this.armL2	= new ModelPartRenderer(this.getPartQuads(obj, ImmutableList.of("ArmLeft2")), "armL2", 0.109375, 0.2324215, 0.17675);
-		this.armR2	= new ModelPartRenderer(this.getPartQuads(obj, ImmutableList.of("ArmRight2")), "armR2", 0.109375, 0.2324215, 0.13595);
-		this.head2	= new ModelPartRenderer(this.getPartQuads(obj, ImmutableList.of("Head2", "Hair2", "ChignonBack2", "ChignonLeft2", "ChignonRight2")), "head2", 0.109375, 0.2375, 0.15625);
-		this.eyeL2	= new ModelPartRenderer(this.getPartQuads(obj, ImmutableList.of("EyeLaft2")), "eyeL2", 0.109375, 0.2375, 0.15625);
-		this.eyeR2	= new ModelPartRenderer(this.getPartQuads(obj, ImmutableList.of("EyeRight2")), "eyeR2", 0.109375, 0.2375, 0.15625);
-		this.tailB2	= new ModelPartRenderer(this.getPartQuads(obj, ImmutableList.of("Ponytail2")), "tailB2", 0.14, 0.2639, 0.15625);
-		this.tailL2	= new ModelPartRenderer(this.getPartQuads(obj, ImmutableList.of("SidetailLeft2")), "tailL2", 0.11875, 0.2668, 0.18125);
-		this.tailR2	= new ModelPartRenderer(this.getPartQuads(obj, ImmutableList.of("SidetailRight2")), "tailR2", 0.11875, 0.2668, 0.13125);
+		this.skirt2	= new ModelPartRenderer(ModelPartRenderer.getPartQuads(obj, ImmutableList.of("Skirt2")), "skirt2", 0.109375, 0.2125, 0.15625);
+		this.legL2	= new ModelPartRenderer(ModelPartRenderer.getPartQuads(obj, ImmutableList.of("LegLeft2")), "legL2", 0.109375, 0.201875, 0.1640625);
+		this.legR2	= new ModelPartRenderer(ModelPartRenderer.getPartQuads(obj, ImmutableList.of("LegRight2")), "legR2", 0.109375, 0.201875, 0.1484375);
+		this.body2	= new ModelPartRenderer(ModelPartRenderer.getPartQuads(obj, ImmutableList.of("Body2")), "body2", 0.109375, 0.201875, 0.15625);
+		this.armL2	= new ModelPartRenderer(ModelPartRenderer.getPartQuads(obj, ImmutableList.of("ArmLeft2")), "armL2", 0.109375, 0.2324215, 0.17675);
+		this.armR2	= new ModelPartRenderer(ModelPartRenderer.getPartQuads(obj, ImmutableList.of("ArmRight2")), "armR2", 0.109375, 0.2324215, 0.13595);
+		this.head2	= new ModelPartRenderer(ModelPartRenderer.getPartQuads(obj, ImmutableList.of("Head2", "Hair2", "ChignonBack2", "ChignonLeft2", "ChignonRight2")), "head2", 0.109375, 0.2375, 0.15625);
+		this.eyeL2	= new ModelPartRenderer(ModelPartRenderer.getPartQuads(obj, ImmutableList.of("EyeLaft2")), "eyeL2", 0.109375, 0.2375, 0.15625);
+		this.eyeR2	= new ModelPartRenderer(ModelPartRenderer.getPartQuads(obj, ImmutableList.of("EyeRight2")), "eyeR2", 0.109375, 0.2375, 0.15625);
+		this.tailB2	= new ModelPartRenderer(ModelPartRenderer.getPartQuads(obj, ImmutableList.of("Ponytail2")), "tailB2", 0.14, 0.2639, 0.15625);
+		this.tailL2	= new ModelPartRenderer(ModelPartRenderer.getPartQuads(obj, ImmutableList.of("SidetailLeft2")), "tailL2", 0.11875, 0.2668, 0.18125);
+		this.tailR2	= new ModelPartRenderer(ModelPartRenderer.getPartQuads(obj, ImmutableList.of("SidetailRight2")), "tailR2", 0.11875, 0.2668, 0.13125);
 
 		// Register Group Trees
 		this.root.children = ImmutableList.of(this.handle);
@@ -691,87 +669,6 @@ public class ModelItemGun127mmType89Single {
 				context.getKey().renderPart(context);
 			}
 		};
-	}
-
-	public static class ModelPartRenderer {
-
-		public String name;
-		public List<BakedQuad> quads;
-		public List<ModelPartRenderer> children = Collections.emptyList();
-		public Vec3d offset;
-		public Consumer<Pair<ModelPartRenderer, RenderItemGun127mmType89Single.RenderContext>> renderPart = context -> context.getKey().renderPart(context);
-
-		public ModelPartRenderer(@Nullable List<BakedQuad> listQuads, String partName, double offsetX, double offsetY, double offsetZ) {
-			this.quads = (listQuads != null) ? listQuads : Collections.emptyList();
-			this.name = partName;
-			this.offset = new Vec3d(offsetX, offsetY, offsetZ);
-		}
-
-		public static void renderPart(Pair<ModelPartRenderer, RenderItemGun127mmType89Single.RenderContext> context) {
-			Tessellator tessellator = Tessellator.getInstance();
-			VertexBuffer vertexbuffer = tessellator.getBuffer();
-
-			vertexbuffer.begin(GL11.GL_QUADS, DefaultVertexFormats.ITEM);
-
-			for (BakedQuad quad : context.getKey().quads) {
-				LightUtil.renderQuadColor(vertexbuffer, quad, -1);
-			}
-
-			tessellator.draw();
-		}
-
-		public void doRender(RenderItemGun127mmType89Single.RenderContext context) {
-			GlStateManager.pushMatrix();
-
-			this.renderPart.accept(Pair.of(this, context));
-
-			for (ModelPartRenderer child : children) {
-				child.doRender(context);
-			}
-
-			GlStateManager.popMatrix();
-		}
-
-	}
-
-	public List<BakedQuad> getPartQuads(OBJModel obj, final List<String> visibleGroups) {
-		List<BakedQuad> quads = Collections.emptyList();
-
-		try {
-			Function<ResourceLocation, TextureAtlasSprite> spriteGetter = resource -> Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(resource.toString());
-
-			// ModelState for handling visibility of each group.
-			IModelState modelState = part -> {
-				if (part.isPresent()) {
-					UnmodifiableIterator<String> parts = Models.getParts(part.get());
-
-					if (parts.hasNext()) {
-						String name = parts.next();
-
-						if (!parts.hasNext()
-								&& visibleGroups.contains(name)) {
-							// Return Absent for NOT invisible group.
-							return Optional.absent();
-						} else {
-							// Return Present for invisible group.
-							return Optional.of(TRSRTransformation
-									.identity());
-						}
-					}
-				}
-
-				return Optional.absent();
-			};
-
-			// Bake model of visible groups.
-			IBakedModel bakedModel = obj.bake(modelState, DefaultVertexFormats.ITEM, spriteGetter);
-
-			quads = bakedModel.getQuads(null, null, 0);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return quads;
 	}
 
 }
