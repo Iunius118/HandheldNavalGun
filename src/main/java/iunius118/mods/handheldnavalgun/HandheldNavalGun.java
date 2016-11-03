@@ -100,8 +100,8 @@ public class HandheldNavalGun {
 				.setCreativeTab(CreativeTabs.COMBAT)
 				.setMaxStackSize(1);
 
-		public static final String NAME_ITEM_ROUND_127MM_TYPE0_AAC = "handheldnavalgun.round_127mm_type0_aac";
-		public static final Item ROUND_127MM_TYPE0_AAC  = new Item() {
+		public static final String NAME_ITEM_ROUND_127MM_AAC = "handheldnavalgun.round_127mm_aac";
+		public static final Item ROUND_127MM_AAC  = new Item() {
 
 			@Override
 			public Multimap<String, AttributeModifier> getAttributeModifiers(EntityEquipmentSlot slot, ItemStack stack) {
@@ -115,8 +115,8 @@ public class HandheldNavalGun {
 			}
 
 		}
-				.setRegistryName(HandheldNavalGun.Items.NAME_ITEM_ROUND_127MM_TYPE0_AAC)
-				.setUnlocalizedName(HandheldNavalGun.Items.NAME_ITEM_ROUND_127MM_TYPE0_AAC)
+				.setRegistryName(HandheldNavalGun.Items.NAME_ITEM_ROUND_127MM_AAC)
+				.setUnlocalizedName(HandheldNavalGun.Items.NAME_ITEM_ROUND_127MM_AAC)
 				.setCreativeTab(CreativeTabs.COMBAT);
 	}
 
@@ -125,7 +125,7 @@ public class HandheldNavalGun {
 		public static final ModelResourceLocation MRL_ITEM_GUN_127MM_TYPE89_SINGLE = new ModelResourceLocation(HandheldNavalGun.MOD_ID + ":gun_127mm_type89_1", "inventory");
 		public static final ResourceLocation RL_OBJ_ITEM_GUN_127MM_TYPE89_SINGLE = new ResourceLocation(HandheldNavalGun.MOD_ID + ":item/gun_127mm_type89_1.obj");
 
-		public static final ModelResourceLocation MRL_ITEM_ROUND_127MM_TYPE0_AAC = new ModelResourceLocation(HandheldNavalGun.MOD_ID + ":round_127mm_type0_aac", "inventory");
+		public static final ModelResourceLocation MRL_ITEM_ROUND_127MM_AAC = new ModelResourceLocation(HandheldNavalGun.MOD_ID + ":round_127mm_aac", "inventory");
 	}
 
 	@SubscribeEvent

@@ -49,7 +49,7 @@ public class HandheldNavalGunRegistry {
 
 	public static void registerItems() {
 		GameRegistry.register(HandheldNavalGun.Items.GUN_127MM_TYPE89_SINGLE);
-		GameRegistry.register(HandheldNavalGun.Items.ROUND_127MM_TYPE0_AAC);
+		GameRegistry.register(HandheldNavalGun.Items.ROUND_127MM_AAC);
 		registerItemRecipes();
 	}
 
@@ -68,7 +68,7 @@ public class HandheldNavalGunRegistry {
 
 		GameRegistry.addRecipe(
 				new ShapedOreRecipe(
-						new ItemStack(HandheldNavalGun.Items.ROUND_127MM_TYPE0_AAC, 16),
+						new ItemStack(HandheldNavalGun.Items.ROUND_127MM_AAC, 16),
 						" c ",
 						"ITI",
 						"ITI",
@@ -79,7 +79,7 @@ public class HandheldNavalGunRegistry {
 
 		GameRegistry.addRecipe(
 				new ShapedOreRecipe(
-						new ItemStack(HandheldNavalGun.Items.ROUND_127MM_TYPE0_AAC, 16),
+						new ItemStack(HandheldNavalGun.Items.ROUND_127MM_AAC, 16),
 						" c ",
 						"STS",
 						"BTB",
@@ -93,7 +93,7 @@ public class HandheldNavalGunRegistry {
 	@SideOnly(Side.CLIENT)
 	public static void registerItemModels() {
 		ModelLoader.setCustomModelResourceLocation(HandheldNavalGun.Items.GUN_127MM_TYPE89_SINGLE, 0, HandheldNavalGun.ModelLocations.MRL_ITEM_GUN_127MM_TYPE89_SINGLE);
-		ModelLoader.setCustomModelResourceLocation(HandheldNavalGun.Items.ROUND_127MM_TYPE0_AAC, 0, HandheldNavalGun.ModelLocations.MRL_ITEM_ROUND_127MM_TYPE0_AAC);
+		ModelLoader.setCustomModelResourceLocation(HandheldNavalGun.Items.ROUND_127MM_AAC, 0, HandheldNavalGun.ModelLocations.MRL_ITEM_ROUND_127MM_AAC);
 	}
 
 	@SideOnly(Side.CLIENT)

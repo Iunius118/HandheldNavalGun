@@ -63,7 +63,7 @@ public class ItemGun127mmType89Single extends Item {
 	}
 
 	public boolean isAmmo(@Nullable ItemStack stack) {
-		return (stack != null) && (stack.getItem() == HandheldNavalGun.Items.ROUND_127MM_TYPE0_AAC);
+		return (stack != null) && (stack.getItem() == HandheldNavalGun.Items.ROUND_127MM_AAC);
 	}
 
 	@Override
