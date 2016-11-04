@@ -37,7 +37,10 @@ public class ItemGun127mmType89Single extends Item {
 
 	public static final String TAG_UNIQUE_ID = "UUID";
 	public static final String TAG_RELOAD_TIME = "reload";
+	public static final String TAG_IS_RELOADABLE = "reloadable";
 	public static final int RELOAD_TIME = 80;
+	public static final int RELOAD_STARTING_TIME = 60;
+
 
 	public ItemGun127mmType89Single() {
 		super();
@@ -96,9 +99,14 @@ public class ItemGun127mmType89Single extends Item {
 	@Override
 	public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn, EnumHand hand) {
 		NBTTagCompound nbt = itemStackIn.getTagCompound();
+
+		if (nbt == null) {
+			return new ActionResult<>(EnumActionResult.PASS, itemStackIn);
+		}
+
 		CapabilityReloadTime.IReloadTimeICapability cap = itemStackIn.getCapability(HandheldNavalGun.Capabilities.getReloadTimeICapability(), null);
 
-		if (cap.getReloadTime() == 0 && nbt != null && nbt.getInteger(this.TAG_RELOAD_TIME) == 0) {
+		if (cap.getReloadTime() == 0 && nbt.getInteger(this.TAG_RELOAD_TIME) == 0 && nbt.getBoolean(this.TAG_IS_RELOADABLE)) {
 
 			if (!worldIn.isRemote) {	// Server: Shot
 				ItemStack heldItem = playerIn.getHeldItem(EnumHand.MAIN_HAND);
@@ -111,18 +119,21 @@ public class ItemGun127mmType89Single extends Item {
 					ItemStack stackAmmo = this.findAmmo(playerIn);
 
 					if (stackAmmo == null) {
-						return new ActionResult<>(EnumActionResult.FAIL, itemStackIn);
+						nbt.setBoolean(this.TAG_IS_RELOADABLE, false);
 					} else {
+						nbt.setBoolean(this.TAG_IS_RELOADABLE, true);
 						--stackAmmo.stackSize;
 
 						if (stackAmmo.stackSize <= 0) {
 							playerIn.inventory.deleteStack(stackAmmo);
 						}
-
-						// drop empty cartridge
-						EntityItem entityitem = new EntityItem(worldIn, playerIn.posX, playerIn.posY + 0.5, playerIn.posZ, new ItemStack(HandheldNavalGun.INSTANCE.itemCartridge));
-						worldIn.spawnEntityInWorld(entityitem);
 					}
+
+					// drop empty cartridge
+					EntityItem entityitem = new EntityItem(worldIn, playerIn.posX, playerIn.posY + 0.5, playerIn.posZ, new ItemStack(HandheldNavalGun.INSTANCE.itemCartridge));
+					worldIn.spawnEntityInWorld(entityitem);
+				} else {
+					nbt.setBoolean(this.TAG_IS_RELOADABLE, true);
 				}
 
 				WorldServer world = (WorldServer)worldIn;
@@ -149,6 +160,28 @@ public class ItemGun127mmType89Single extends Item {
 			}
 
 			return new ActionResult<>(EnumActionResult.SUCCESS, itemStackIn);
+
+		} else if (cap.getReloadTime() <= this.RELOAD_STARTING_TIME && !nbt.getBoolean(this.TAG_IS_RELOADABLE)) {
+			if (!worldIn.isRemote) { // Server: Reload late
+				ItemStack stackAmmo = this.findAmmo(playerIn);
+				if (!playerIn.capabilities.isCreativeMode) {
+					if (stackAmmo != null) {
+						--stackAmmo.stackSize;
+
+						if (stackAmmo.stackSize <= 0) {
+							playerIn.inventory.deleteStack(stackAmmo);
+						}
+
+						nbt.setBoolean(this.TAG_IS_RELOADABLE, true);
+						nbt.setInteger(this.TAG_RELOAD_TIME, this.RELOAD_STARTING_TIME);
+						return new ActionResult<>(EnumActionResult.SUCCESS, itemStackIn);
+					}
+				} else {
+					nbt.setBoolean(this.TAG_IS_RELOADABLE, true);
+					nbt.setInteger(this.TAG_RELOAD_TIME, this.RELOAD_STARTING_TIME);
+					return new ActionResult<>(EnumActionResult.SUCCESS, itemStackIn);
+				}
+			}
 		}
 
 		return new ActionResult<>(EnumActionResult.PASS, itemStackIn);
@@ -159,20 +192,25 @@ public class ItemGun127mmType89Single extends Item {
 		NBTTagCompound nbt = stack.getTagCompound();
 		CapabilityReloadTime.IReloadTimeICapability cap = stack.getCapability(HandheldNavalGun.Capabilities.getReloadTimeICapability(), null);
 
-		cap.progress();	// Progress reload
-		// System.out.println((worldIn.isRemote ? "C " : "S ") + "CAP: " + cap.getReloadTime());
-
 		if (nbt != null) {
+			cap.progress(nbt.getBoolean(this.TAG_IS_RELOADABLE), this.RELOAD_STARTING_TIME);	// Progress reload
+			// System.out.println((worldIn.isRemote ? "C " : "S ") + "CAP: " + cap.getReloadTime());
+
 			// System.out.println((worldIn.isRemote ? "C " : "S ") + "NBT: " + nbt.getInteger(this.TAG_RELOAD_TIME));
 
 			if (worldIn.isRemote) {
 				if (nbt.getInteger(this.TAG_RELOAD_TIME) == this.RELOAD_TIME) {	// Client: Shot in Server
 					nbt.setInteger(this.TAG_RELOAD_TIME, 0);
 					cap.setReloadTime(this.RELOAD_TIME);
+				} else if (nbt.getInteger(this.TAG_RELOAD_TIME) == this.RELOAD_STARTING_TIME) {	// Client: Reload in Server
+					nbt.setInteger(this.TAG_RELOAD_TIME, 0);
+					cap.setReloadTime(this.RELOAD_STARTING_TIME);
 				}
 			} else {
-				if (cap.getReloadTime() <= 1) {	// Server: Complete reload
+				if (cap.getReloadTime() <= 1 && nbt.getInteger(this.TAG_RELOAD_TIME) != 0) {	// Server: Complete reload
 					nbt.setInteger(this.TAG_RELOAD_TIME, 0);	// ...and send to Client
+				} else if (cap.getReloadTime() <= this.RELOAD_STARTING_TIME && !nbt.getBoolean(this.TAG_IS_RELOADABLE)) {	// Server: Not Reload-able
+					nbt.setInteger(this.TAG_RELOAD_TIME, this.RELOAD_STARTING_TIME);	// ...and send to Client
 				}
 			}
 		} else {
@@ -214,7 +252,7 @@ public class ItemGun127mmType89Single extends Item {
 	// */
 
 	public boolean compareUUIDFromItemStack(ItemStack stackA, ItemStack stackB) {
-		if (stackA.hasTagCompound() && stackB.hasTagCompound()) {
+		if (stackA != null && stackB != null && stackA.hasTagCompound() && stackB.hasTagCompound()) {
 			NBTTagCompound tagA = stackA.getTagCompound();
 			NBTTagCompound tagB = stackB.getTagCompound();
 

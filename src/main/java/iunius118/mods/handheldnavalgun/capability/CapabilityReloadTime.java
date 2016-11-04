@@ -35,9 +35,13 @@ public class CapabilityReloadTime {
 		}
 
 		@Override
-		public int progress() {
-			if (--this.reloadTime < 0) {
-				 this.reloadTime = 0;
+		public int progress(boolean isReloadable, int timeReload) {
+			--this.reloadTime;
+
+			if (isReloadable) {
+				if (this.reloadTime < 0) this.reloadTime = 0;
+			}  else {
+				if (this.reloadTime < timeReload) this.reloadTime = timeReload;
 			}
 
 			return this.reloadTime;
@@ -76,7 +80,7 @@ public class CapabilityReloadTime {
 		}
 
 		@Override
-		public int progress() {
+		public int progress(boolean isReloadable, int timeReload) {
 			return 0;
 		}
 
@@ -102,7 +106,7 @@ public class CapabilityReloadTime {
 
 		public int getReloadTime();
 
-		public int progress();
+		public int progress(boolean isReloadable, int timeReload);
 
 	}
 

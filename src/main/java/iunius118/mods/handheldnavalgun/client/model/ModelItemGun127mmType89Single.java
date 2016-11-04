@@ -124,7 +124,8 @@ public class ModelItemGun127mmType89Single {
 	 *
 	 * 80-75 recoil and draw rammer
 	 * 75-60 counter-recoil (75-70 release breech, 75-65 eject cartridge)
-	 * 60-45 set round (60-50) on tray (50-)
+	 * 60-59 counter-recoil completed
+	 * 59-45 set round (59-50) on tray (50-)
 	 * 45-35 push tray
 	 * 35-15 load round and push rammer
 	 * 15-05 draw tray
@@ -516,17 +517,17 @@ public class ModelItemGun127mmType89Single {
 			float rt = t - Animation.getPartialTickTime();
 			Vec3d offset = context.getKey().offset;
 
-			if (t <= 1 || t > 60) {
+			if (t <= 1 || t >= 60) {
 				// 80-60 home position
 				float f = MathHelper.sin(Animation.getWorldTime(Minecraft.getMinecraft().theWorld, Animation.getPartialTickTime()) % 4 * (float)Math.PI / 2) * 2;
 				GlStateManager.translate(offset.xCoord, offset.yCoord, offset.zCoord - 0.003125);
 				GlStateManager.rotate(-15 + f, 1, 0, 0);
 				GlStateManager.translate(-offset.xCoord, -offset.yCoord, -offset.zCoord);
 			} else if (t > 50) {
-				// 60-50 set round
-				float f = 10 - (rt - 50);
+				// 59-50 set round
+				float f = 9 - (rt - 50);
 				GlStateManager.translate(offset.xCoord, offset.yCoord, offset.zCoord - 0.003125);
-				GlStateManager.rotate(-f * 11, 0, 0, 1);
+				GlStateManager.rotate(-f * 12.22F, 0, 0, 1);
 				GlStateManager.rotate(-5 - (rt - 50), 1, 0, 0);
 				GlStateManager.translate(-offset.xCoord, -offset.yCoord, -offset.zCoord);
 			} else if (t > 45) {
@@ -573,17 +574,17 @@ public class ModelItemGun127mmType89Single {
 			float rt = t - Animation.getPartialTickTime();
 			Vec3d offset = context.getKey().offset;
 
-			if (t <= 1 || t > 60) {
+			if (t <= 1 || t >= 60) {
 				// 80-60 home position
 				float f = MathHelper.sin(Animation.getWorldTime(Minecraft.getMinecraft().theWorld, Animation.getPartialTickTime()) % 4 * (float)Math.PI / 2) * 2;
 				GlStateManager.translate(offset.xCoord, offset.yCoord, offset.zCoord + 0.003125);
 				GlStateManager.rotate(15 - f, 1, 0, 0);
 				GlStateManager.translate(-offset.xCoord, -offset.yCoord, -offset.zCoord);
 			} else if (t > 50) {
-				// 60-50 set round
-				float f = 10 - (rt - 50);
-				GlStateManager.translate(offset.xCoord, offset.yCoord, offset.zCoord + 0.003125);
-				GlStateManager.rotate(-f * 11, 0, 0, 1);
+				// 59-50 set round
+				float f = 9 - (rt - 50);
+				GlStateManager.translate(offset.xCoord, offset.yCoord, offset.zCoord - 0.003125);
+				GlStateManager.rotate(-f * 12.22F, 0, 0, 1);
 				GlStateManager.rotate(5 + (rt - 50), 1, 0, 0);
 				GlStateManager.translate(-offset.xCoord, -offset.yCoord, -offset.zCoord);
 			} else if (t > 45) {
