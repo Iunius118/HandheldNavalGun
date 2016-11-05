@@ -45,7 +45,7 @@ public class HandheldNavalGun {
 	public static final String MOD_ID = "handheldnavalgun";
 	public static final String MOD_NAME = "HandheldNavalGun";
 	public static final String MOD_VERSION = "0.0.1 beta";
-	public static final String MOD_DEPENDENCIES = "required-after:Forge@[1.10.2-12.18.1.2011,)";
+	public static final String MOD_DEPENDENCIES = "required-after:Forge@[1.10.2-12.18.2.2099,)";
 	public static final String MOD_ACCEPTED_MC_VERSIONS = "[1.10.2,]";
 
 	@Mod.Instance(MOD_ID)
