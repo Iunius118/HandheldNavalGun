@@ -41,7 +41,6 @@ public class ItemGun127mmType89Single extends Item {
 	public static final int RELOAD_TIME = 80;
 	public static final int RELOAD_STARTING_TIME = 60;
 
-
 	public ItemGun127mmType89Single() {
 		super();
 	}
@@ -72,11 +71,12 @@ public class ItemGun127mmType89Single extends Item {
 	@Override
 	public boolean onEntitySwing(EntityLivingBase entityLiving, ItemStack stack) {
 		if (entityLiving.worldObj.isRemote && entityLiving == Minecraft.getMinecraft().thePlayer) {
+			// Targeting process
 			RayTraceResult result = ClientUtils.getMouseOver(256.0D, 1.0F);
 			RangeKeeperGun127mmType89 rangeKeeper = HandheldNavalGun.INSTANCE.rangeKeeper;
 
 			if (Minecraft.getMinecraft().thePlayer.isSneaking()) {
-				// if sneaking, release target
+				// when sneaking, release target
 				rangeKeeper.setTarget(null);
 			} else if (result != null && result.typeOfHit != RayTraceResult.Type.MISS) {
 				// set target to range-keeper
@@ -115,12 +115,18 @@ public class ItemGun127mmType89Single extends Item {
 					return new ActionResult<>(EnumActionResult.FAIL, itemStackIn);
 				}
 
-				if (!playerIn.capabilities.isCreativeMode) {
+				if (playerIn.capabilities.isCreativeMode) {
+					// Creative Mode
+					nbt.setBoolean(this.TAG_IS_RELOADABLE, true);
+				} else {
+					// Survival Mode
 					ItemStack stackAmmo = this.findAmmo(playerIn);
 
 					if (stackAmmo == null) {
+						// not have ammo, shot without reload
 						nbt.setBoolean(this.TAG_IS_RELOADABLE, false);
 					} else {
+						// reload and consume ammo
 						nbt.setBoolean(this.TAG_IS_RELOADABLE, true);
 						--stackAmmo.stackSize;
 
@@ -129,11 +135,9 @@ public class ItemGun127mmType89Single extends Item {
 						}
 					}
 
-					// drop empty cartridge
+					// drop empty cartridge item
 					EntityItem entityitem = new EntityItem(worldIn, playerIn.posX, playerIn.posY + 0.5, playerIn.posZ, new ItemStack(HandheldNavalGun.INSTANCE.itemCartridge));
 					worldIn.spawnEntityInWorld(entityitem);
-				} else {
-					nbt.setBoolean(this.TAG_IS_RELOADABLE, true);
 				}
 
 				WorldServer world = (WorldServer)worldIn;
@@ -163,8 +167,15 @@ public class ItemGun127mmType89Single extends Item {
 
 		} else if (cap.getReloadTime() <= this.RELOAD_STARTING_TIME && !nbt.getBoolean(this.TAG_IS_RELOADABLE)) {
 			if (!worldIn.isRemote) { // Server: Reload late
-				ItemStack stackAmmo = this.findAmmo(playerIn);
-				if (!playerIn.capabilities.isCreativeMode) {
+				if (playerIn.capabilities.isCreativeMode) {
+					// Creative Mode
+					nbt.setBoolean(this.TAG_IS_RELOADABLE, true);
+					nbt.setInteger(this.TAG_RELOAD_TIME, this.RELOAD_STARTING_TIME);
+					return new ActionResult<>(EnumActionResult.SUCCESS, itemStackIn);
+				} else {
+					// Survival Mode
+					ItemStack stackAmmo = this.findAmmo(playerIn);
+
 					if (stackAmmo != null) {
 						--stackAmmo.stackSize;
 
@@ -176,10 +187,6 @@ public class ItemGun127mmType89Single extends Item {
 						nbt.setInteger(this.TAG_RELOAD_TIME, this.RELOAD_STARTING_TIME);
 						return new ActionResult<>(EnumActionResult.SUCCESS, itemStackIn);
 					}
-				} else {
-					nbt.setBoolean(this.TAG_IS_RELOADABLE, true);
-					nbt.setInteger(this.TAG_RELOAD_TIME, this.RELOAD_STARTING_TIME);
-					return new ActionResult<>(EnumActionResult.SUCCESS, itemStackIn);
 				}
 			}
 		}
@@ -199,17 +206,21 @@ public class ItemGun127mmType89Single extends Item {
 			// System.out.println((worldIn.isRemote ? "C " : "S ") + "NBT: " + nbt.getInteger(this.TAG_RELOAD_TIME));
 
 			if (worldIn.isRemote) {
-				if (nbt.getInteger(this.TAG_RELOAD_TIME) == this.RELOAD_TIME) {	// Client: Shot in Server
+				if (nbt.getInteger(this.TAG_RELOAD_TIME) == this.RELOAD_TIME) {
+					// Client: Shot in Server
 					nbt.setInteger(this.TAG_RELOAD_TIME, 0);
 					cap.setReloadTime(this.RELOAD_TIME);
-				} else if (nbt.getInteger(this.TAG_RELOAD_TIME) == this.RELOAD_STARTING_TIME) {	// Client: Reload in Server
+				} else if (nbt.getInteger(this.TAG_RELOAD_TIME) == this.RELOAD_STARTING_TIME) {
+					// Client: Reload in Server
 					nbt.setInteger(this.TAG_RELOAD_TIME, 0);
 					cap.setReloadTime(this.RELOAD_STARTING_TIME);
 				}
 			} else {
-				if (cap.getReloadTime() <= 1 && nbt.getInteger(this.TAG_RELOAD_TIME) != 0) {	// Server: Complete reload
+				if (cap.getReloadTime() <= 1 && nbt.getInteger(this.TAG_RELOAD_TIME) != 0) {
+					// Server: Complete reload
 					nbt.setInteger(this.TAG_RELOAD_TIME, 0);	// ...and send to Client
-				} else if (cap.getReloadTime() <= this.RELOAD_STARTING_TIME && !nbt.getBoolean(this.TAG_IS_RELOADABLE)) {	// Server: Not Reload-able
+				} else if (cap.getReloadTime() <= this.RELOAD_STARTING_TIME && !nbt.getBoolean(this.TAG_IS_RELOADABLE)) {
+					// Server: Not reload-able
 					nbt.setInteger(this.TAG_RELOAD_TIME, this.RELOAD_STARTING_TIME);	// ...and send to Client
 				}
 			}
@@ -223,17 +234,38 @@ public class ItemGun127mmType89Single extends Item {
 
 	/*
 	 * Reload system
-	 *  S(cap= 0, nbt= 0), C(cap= 0, nbt= 0) at onUpdate
-	 *  S(cap=80, nbt=80), C(cap= 0, nbt= 0) SHOT and update Server NBT and capability at onItemRightClick
+	 *  * Reload-able
+	 *  S(cap= 0, nbt= 0 T), C(cap= 0, nbt= 0 F) at onUpdate
+	 *  S(cap=80, nbt=80 T), C(cap= 0, nbt= 0 F) SHOT and update Server NBT and capability at onItemRightClick
 	 *   +1
-	 *  S(cap=80, nbt=80), C(cap= 0, nbt=80) sync NBT and renew Client ItemStack
-	 *  S(cap=79, nbt=80), C(cap= 0, nbt=80) progress reload time at onUpdate
-	 *  S(cap=79, nbt=80), C(cap=80, nbt= 0) update Client capability at onUpdate
+	 *  S(cap=80, nbt=80 T), C(cap= 0, nbt=80 T) sync NBT and renew Client ItemStack
+	 *  S(cap=79, nbt=80 T), C(cap= 0, nbt=80 T) progress reload time at onUpdate
+	 *  S(cap=79, nbt=80 T), C(cap=80, nbt= 0 T) update Client capability at onUpdate
 	 *   +78
-	 *  S(cap= 1, nbt=80), C(cap= 2, nbt= 0) at onUpdate
-	 *  S(cap= 1, nbt= 0), C(cap= 2, nbt= 0) update Server NBT at onUpdate
+	 *  S(cap= 1, nbt=80 T), C(cap= 2, nbt= 0 T) at onUpdate
+	 *  S(cap= 1, nbt= 0 T), C(cap= 2, nbt= 0 T) update Server NBT at onUpdate
 	 *   +1
-	 *  S(cap= 0, nbt= 0), C(cap= 0 ,nbt= 0) sync NBT and renew Client ItemStack
+	 *  S(cap= 0, nbt= 0 T), C(cap= 0 ,nbt= 0 T) sync NBT and renew Client ItemStack
+	 *
+	 *  * Not Reload-able
+	 *   SHOT, +1 and +59
+	 *  S(cap=60, nbt=80 F), C(cap=61, nbt= 0 F) at onUpdate
+	 *  S(cap=60, nbt=60 F), C(cap=61, nbt= 0 F) update Server NBT at onUpdate
+	 *   +1
+	 *  S(cap=60, nbt=60 F), C(cap= 0 ,nbt=60 F) sync NBT and renew Client ItemStack
+	 *  S(cap=60, nbt=60 F), C(cap=60, nbt= 0 F) update Client capability at onUpdate
+	 *
+	 *  * Reload late
+	 *  S(cap=60, nbt=60 T), C(cap=60, nbt= 0 F) RELOAD and update Server NBT and capability at onItemRightClick
+	 *   +1
+	 *  S(cap=60, nbt=60 F), C(cap= 0 ,nbt=60 T) sync NBT and renew Client ItemStack
+	 *  S(cap=59, nbt=60 T), C(cap= 0, nbt=60 T) progress reload time at onUpdate
+	 *  S(cap=59, nbt=60 T), C(cap=60, nbt= 0 T) update Client capability at onUpdate
+	 *   +58
+	 *  S(cap= 1, nbt=60 T), C(cap= 2, nbt= 0 T) at onUpdate
+	 *  S(cap= 1, nbt= 0 T), C(cap= 2, nbt= 0 T) update Server NBT at onUpdate
+	 *   +1
+	 *  S(cap= 0, nbt= 0 T), C(cap= 0 ,nbt= 0 T) sync NBT and renew Client ItemStack
 	 */
 
 	/*

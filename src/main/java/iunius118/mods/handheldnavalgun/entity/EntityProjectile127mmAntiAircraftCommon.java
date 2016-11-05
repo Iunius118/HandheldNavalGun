@@ -126,6 +126,7 @@ public class EntityProjectile127mmAntiAircraftCommon extends EntityThrowable {
 			WorldServer world = (WorldServer)this.worldObj;
 
 			if (this.ticksExisted > this.FUSE_SAFETY) {
+				// create explosion
 				world.spawnParticle(EnumParticleTypes.EXPLOSION_HUGE, true, result.hitVec.xCoord, result.hitVec.yCoord, result.hitVec.zCoord, 1, 0.0D, 0.0D, 0.0D, 0.0D, new int[0]);
 				world.playSound(null, this.posX, this.posY, this.posZ, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.BLOCKS, 4.0F, (1.0F + (this.worldObj.rand.nextFloat() - this.worldObj.rand.nextFloat()) * 0.2F) * 0.7F);
 				Explosion explosion = world.createExplosion(this.getThrower(), result.hitVec.xCoord, result.hitVec.yCoord, result.hitVec.zCoord, this.STRENGTH, false);
@@ -135,6 +136,7 @@ public class EntityProjectile127mmAntiAircraftCommon extends EntityThrowable {
 					posExp = new BlockPos(result.hitVec.xCoord, result.hitVec.yCoord, result.hitVec.zCoord);
 				}
 
+				// induced explosion of TNT
 				for (int x = -5; x < 6; x++) {
 					for (int y = -5; y < 6; y++) {
 						for (int z = -5; z < 6; z++) {
@@ -148,6 +150,7 @@ public class EntityProjectile127mmAntiAircraftCommon extends EntityThrowable {
 					}
 				}
 			} else {
+				// hit at close distance (in a very short time), deal direct damage
 				if (result.typeOfHit == RayTraceResult.Type.ENTITY) {
 					if (result.entityHit instanceof EntityPlayer) {
 						if (result.entityHit != this.getThrower()) {
