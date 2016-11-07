@@ -1,6 +1,8 @@
 package iunius118.mods.handheldnavalgun;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 
@@ -8,6 +10,7 @@ import com.google.common.collect.Multimap;
 
 import iunius118.mods.handheldnavalgun.capability.CapabilityReloadTime;
 import iunius118.mods.handheldnavalgun.client.ClientEventHandler;
+import iunius118.mods.handheldnavalgun.client.HandheldNavalGunClientRegistry;
 import iunius118.mods.handheldnavalgun.client.RangeKeeperGun127mmType89;
 import iunius118.mods.handheldnavalgun.client.model.ModelItemGun127mmType89Single;
 import iunius118.mods.handheldnavalgun.item.ItemGun127mmType89Single;
@@ -30,6 +33,8 @@ import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.oredict.OreDictionary;
@@ -44,29 +49,38 @@ public class HandheldNavalGun {
 
 	public static final String MOD_ID = "handheldnavalgun";
 	public static final String MOD_NAME = "HandheldNavalGun";
-	public static final String MOD_VERSION = "0.0.1 beta";
+	public static final String MOD_VERSION = "0.0.2 beta";
 	public static final String MOD_DEPENDENCIES = "required-after:Forge@[1.10.2-12.18.2.2099,)";
 	public static final String MOD_ACCEPTED_MC_VERSIONS = "[1.10.2,]";
 
 	@Mod.Instance(MOD_ID)
 	public static HandheldNavalGun INSTANCE;
 
-	public final RangeKeeperGun127mmType89 rangeKeeper = new RangeKeeperGun127mmType89();
-	public Vec3d vec3Target = null;
-	public Vec3d vec3Marker = null;
-	public final ModelItemGun127mmType89Single modelGunPart = new ModelItemGun127mmType89Single();
+	public Map<String, Integer> mapShell = new HashMap<>();
 	public Item itemCartridge = net.minecraft.init.Items.IRON_INGOT;
+
+	@SideOnly(Side.CLIENT)
+	public RangeKeeperGun127mmType89 rangeKeeper;
+	@SideOnly(Side.CLIENT)
+	public Vec3d vec3Target;
+	@SideOnly(Side.CLIENT)
+	public Vec3d vec3Marker;
+	@SideOnly(Side.CLIENT)
+	public ModelItemGun127mmType89Single modelGunPart;
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event){
+		HandheldNavalGunRegistry.registerMessage();
 		HandheldNavalGunRegistry.registerCapabilities();
 		HandheldNavalGunRegistry.registerItems();
 		HandheldNavalGunRegistry.resisterEntities();
 		MinecraftForge.EVENT_BUS.register(this);
 
 		if (event.getSide().isClient()) {
+			this.rangeKeeper = new RangeKeeperGun127mmType89();
+			this.modelGunPart = new ModelItemGun127mmType89Single();
 			OBJLoader.INSTANCE.addDomain(MOD_ID);
-			HandheldNavalGunRegistry.registerItemModels();
+			HandheldNavalGunClientRegistry.registerItemModels();
 			MinecraftForge.EVENT_BUS.register(ClientEventHandler.INSTANCE);
 		}
 	}
@@ -78,6 +92,10 @@ public class HandheldNavalGun {
 		if (!list.isEmpty()) {
 			this.itemCartridge = list.get(0).getItem();
 		}
+	}
+
+	public static class PacketHandler {
+		public static final SimpleNetworkWrapper INSTANCE = NetworkRegistry.INSTANCE.newSimpleChannel(HandheldNavalGun.MOD_ID);
 	}
 
 	public static class Capabilities {

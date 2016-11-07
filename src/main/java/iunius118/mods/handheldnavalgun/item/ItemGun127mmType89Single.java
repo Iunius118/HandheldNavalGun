@@ -5,11 +5,13 @@ import javax.annotation.Nullable;
 import com.google.common.collect.Multimap;
 
 import iunius118.mods.handheldnavalgun.HandheldNavalGun;
+import iunius118.mods.handheldnavalgun.HandheldNavalGun.PacketHandler;
 import iunius118.mods.handheldnavalgun.capability.CapabilityReloadTime;
 import iunius118.mods.handheldnavalgun.client.RangeKeeperGun127mmType89;
 import iunius118.mods.handheldnavalgun.client.util.ClientUtils;
 import iunius118.mods.handheldnavalgun.client.util.Target;
 import iunius118.mods.handheldnavalgun.entity.EntityProjectile127mmAntiAircraftCommon;
+import iunius118.mods.handheldnavalgun.packet.MessageGunShot;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -143,13 +145,23 @@ public class ItemGun127mmType89Single extends Item {
 				WorldServer world = (WorldServer)worldIn;
 
 				EntityProjectile127mmAntiAircraftCommon entity = new EntityProjectile127mmAntiAircraftCommon(world, playerIn);
-				RangeKeeperGun127mmType89 rangeKeeper = HandheldNavalGun.INSTANCE.rangeKeeper;
 
-				if (rangeKeeper.isValid()) {
-					entity.setFuseSafety(rangeKeeper.getFuse());
+				if (nbt.hasUniqueId(this.TAG_UNIQUE_ID)) {
+					synchronized(HandheldNavalGun.INSTANCE.mapShell) {
+						// Server: set fuse from Client packet
+						String strUUID = nbt.getUniqueId(this.TAG_UNIQUE_ID).toString();
+						Integer fuse = HandheldNavalGun.INSTANCE.mapShell.get(strUUID);
+
+						if (fuse != null) {
+							HandheldNavalGun.INSTANCE.mapShell.remove(strUUID);
+						} else {
+							fuse = EntityProjectile127mmAntiAircraftCommon.FUSE_MAX;
+						}
+
+						entity.setFuseSafety(fuse.intValue());
+						world.spawnEntityInWorld(entity);
+					}
 				}
-
-				playerIn.worldObj.spawnEntityInWorld(entity);
 
 				Vec3d look = playerIn.getLook(1.0F).scale(2.0D);
 				double x = playerIn.posX + look.xCoord;
@@ -161,6 +173,13 @@ public class ItemGun127mmType89Single extends Item {
 				cap.setReloadTime(this.RELOAD_TIME);
 				nbt.setInteger(this.TAG_RELOAD_TIME, this.RELOAD_TIME);	// Send to Client
 				// System.out.println("SHOT");
+			} else {
+				RangeKeeperGun127mmType89 rangeKeeper = HandheldNavalGun.INSTANCE.rangeKeeper;
+
+				if (rangeKeeper.isValid() && nbt.hasUniqueId(this.TAG_UNIQUE_ID)) {
+					// Client: send fuse tick to Server
+					PacketHandler.INSTANCE.sendToServer(new MessageGunShot(nbt.getUniqueId(this.TAG_UNIQUE_ID), rangeKeeper.getFuse()));
+				}
 			}
 
 			return new ActionResult<>(EnumActionResult.SUCCESS, itemStackIn);

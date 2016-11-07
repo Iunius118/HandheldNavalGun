@@ -3,7 +3,6 @@ package iunius118.mods.handheldnavalgun.client;
 import org.lwjgl.opengl.GL11;
 
 import iunius118.mods.handheldnavalgun.HandheldNavalGun;
-import iunius118.mods.handheldnavalgun.HandheldNavalGunRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
@@ -40,13 +39,13 @@ public class ClientEventHandler {
 
 	@SubscribeEvent
 	public void onTextureStitchEvent(TextureStitchEvent.Pre event) {
-		HandheldNavalGunRegistry.registerSprites(event);
+		HandheldNavalGunClientRegistry.registerSprites(event);
 	}
 
 	@SubscribeEvent
 	public void onModelBakeEvent(ModelBakeEvent event) {
-		HandheldNavalGunRegistry.registerBakedModels(event);
-		HandheldNavalGunRegistry.registerRenderers();
+		HandheldNavalGunClientRegistry.registerBakedModels(event);
+		HandheldNavalGunClientRegistry.registerRenderers();
 	}
 
 	@SubscribeEvent
