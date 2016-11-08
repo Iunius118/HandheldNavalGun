@@ -6,19 +6,15 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
-import com.google.common.collect.Multimap;
-
 import iunius118.mods.handheldnavalgun.capability.CapabilityReloadTime;
 import iunius118.mods.handheldnavalgun.client.ClientEventHandler;
 import iunius118.mods.handheldnavalgun.client.HandheldNavalGunClientRegistry;
 import iunius118.mods.handheldnavalgun.client.RangeKeeperGun127mmType89;
 import iunius118.mods.handheldnavalgun.client.model.ModelItemGun127mmType89Single;
 import iunius118.mods.handheldnavalgun.item.ItemGun127mmType89Single;
+import iunius118.mods.handheldnavalgun.item.ItemRound127mmAntiAircraftCommon;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -119,20 +115,7 @@ public class HandheldNavalGun {
 				.setMaxStackSize(1);
 
 		public static final String NAME_ITEM_ROUND_127MM_AAC = "handheldnavalgun.round_127mm_aac";
-		public static final Item ROUND_127MM_AAC  = new Item() {
-
-			@Override
-			public Multimap<String, AttributeModifier> getAttributeModifiers(EntityEquipmentSlot slot, ItemStack stack) {
-				Multimap<String, AttributeModifier> multimap = super.getAttributeModifiers(slot, stack);
-
-				if (slot == EntityEquipmentSlot.MAINHAND) {
-					multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getAttributeUnlocalizedName(), new AttributeModifier(this.ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 5.0D, 0));
-				}
-
-				return multimap;
-			}
-
-		}
+		public static final Item ROUND_127MM_AAC  = new ItemRound127mmAntiAircraftCommon()
 				.setRegistryName(HandheldNavalGun.Items.NAME_ITEM_ROUND_127MM_AAC)
 				.setUnlocalizedName(HandheldNavalGun.Items.NAME_ITEM_ROUND_127MM_AAC)
 				.setCreativeTab(CreativeTabs.COMBAT);
