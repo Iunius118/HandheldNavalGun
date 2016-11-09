@@ -41,6 +41,7 @@ public class EntityProjectile127mmAntiAircraftCommon extends EntityThrowable {
 
 	public EntityProjectile127mmAntiAircraftCommon(World worldIn, EntityLivingBase throwerIn) {
 		super(worldIn, throwerIn);
+		this.ignoreEntity = throwerIn;
 		this.setHeadingFromThrower(throwerIn, throwerIn.rotationPitch, throwerIn.rotationYaw, 0.0F, this.INITIAL_VELOCITY, this.INACCURACY);
 	}
 
@@ -123,6 +124,7 @@ public class EntityProjectile127mmAntiAircraftCommon extends EntityThrowable {
 	@Override
 	protected void onImpact(RayTraceResult result) {
 		if (!this.worldObj.isRemote) {
+			// Server
 			WorldServer world = (WorldServer)this.worldObj;
 
 			if (this.ticksExisted > this.FUSE_SAFETY) {
@@ -153,9 +155,7 @@ public class EntityProjectile127mmAntiAircraftCommon extends EntityThrowable {
 				// hit at close distance (in a very short time), deal direct damage
 				if (result.typeOfHit == RayTraceResult.Type.ENTITY) {
 					if (result.entityHit instanceof EntityPlayer) {
-						if (result.entityHit != this.getThrower()) {
-							result.entityHit.attackEntityFrom(DamageSource.causePlayerDamage((EntityPlayer)this.getThrower()), 40.0F);
-						}
+						result.entityHit.attackEntityFrom(DamageSource.causePlayerDamage((EntityPlayer)this.getThrower()), 40.0F);
 					} else {
 						result.entityHit.attackEntityFrom(DamageSource.causeMobDamage(this.getThrower()), 40.0F);
 					}
@@ -167,9 +167,18 @@ public class EntityProjectile127mmAntiAircraftCommon extends EntityThrowable {
 				EntityItem entityitem = new EntityItem(world, result.hitVec.xCoord, result.hitVec.yCoord, result.hitVec.zCoord, new ItemStack(Items.IRON_INGOT));
 				world.spawnEntityInWorld(entityitem);
 			}
-		}
 
-		this.setDead();
+			this.setDead();
+		} else {
+			// Client
+			if (result.typeOfHit == RayTraceResult.Type.ENTITY) {
+				if (result.entityHit == this) {
+					this.setDead();
+				}
+			} else {
+				this.setDead();
+			}
+		}
 	}
 
 	@Override
