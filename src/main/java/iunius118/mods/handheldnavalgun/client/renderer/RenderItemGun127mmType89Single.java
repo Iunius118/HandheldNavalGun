@@ -11,6 +11,7 @@ import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumHandSide;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.animation.Animation;
 import net.minecraftforge.common.util.Constants.NBT;
@@ -23,10 +24,15 @@ public class RenderItemGun127mmType89Single extends TileEntitySpecialRenderer<Ti
 
 		Minecraft mc = Minecraft.getMinecraft();
 		ModelBakedItemOBJ model = (ModelBakedItemOBJ)mc.getRenderItem().getItemModelMesher().getModelManager().getModel(HandheldNavalGun.ModelLocations.MRL_ITEM_GUN_127MM_TYPE89_SINGLE);
+		RenderContext context = new RenderContext(model.item, model.player, model.transformTypeCamera);
 
 		GlStateManager.popMatrix();
 
-		HandheldNavalGun.INSTANCE.modelGunPart.root.doRender(new RenderContext(model.item, model.player, model.transformTypeCamera));
+		if (context.isMainHand) {
+			HandheldNavalGun.INSTANCE.modelGunPartMainHand.root.doRender(context);
+		} else {
+			HandheldNavalGun.INSTANCE.modelGunPartOffHand.root.doRender(context);
+		}
 
 		GlStateManager.pushMatrix();
 	}
@@ -38,11 +44,36 @@ public class RenderItemGun127mmType89Single extends TileEntitySpecialRenderer<Ti
 		public boolean isThePlayer;
 		public boolean isFirstPersonView;
 		public boolean isThirdPersonView;
-		public boolean isLeftHand;
+		public boolean isRightHand;
+		public boolean isMainHand;
 		public float playerPitch;
 		public ItemStack stack;
 
 		public RenderContext(ItemStack item, EntityLivingBase entity, TransformType cameraTransformType) {
+			this.stack = item;
+			this.transformTypeCamera = cameraTransformType;
+			this.isFirstPersonView = false;
+			this.isThirdPersonView = false;
+			this.isRightHand = false;
+			this.isMainHand = false;
+
+			switch (cameraTransformType) {
+			case FIRST_PERSON_LEFT_HAND:
+				this.isFirstPersonView = true;
+				break;
+			case FIRST_PERSON_RIGHT_HAND:
+				this.isFirstPersonView = isRightHand = true;
+				break;
+			case THIRD_PERSON_LEFT_HAND:
+				this.isThirdPersonView = true;
+				break;
+			case THIRD_PERSON_RIGHT_HAND:
+				this.isThirdPersonView = isRightHand = true;
+				break;
+			default:
+				break;
+			}
+
 			if (item != null) {
 				CapabilityReloadTime.IReloadTimeICapability cap = item.getCapability(HandheldNavalGun.Capabilities.getReloadTimeICapability(), null);
 				this.reloadTick = (cap != null) ? cap.getReloadTime() : 0;
@@ -53,33 +84,16 @@ public class RenderItemGun127mmType89Single extends TileEntitySpecialRenderer<Ti
 			if (entity != null) {
 				this.playerPitch = entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * Animation.getPartialTickTime();
 				this.isThePlayer = (Minecraft.getMinecraft().thePlayer == entity);
+				EnumHandSide mainHandSide = entity.getPrimaryHand();
+
+				if ((mainHandSide == EnumHandSide.RIGHT && this.isRightHand) || (mainHandSide == EnumHandSide.LEFT && !this.isRightHand)) {
+					this.isMainHand = true;
+				}
 			} else {
 				this.playerPitch = 0;
 				this.isThePlayer = false;
 			}
 
-			this.stack = item;
-			this.transformTypeCamera = cameraTransformType;
-			this.isFirstPersonView = false;
-			this.isThirdPersonView = false;
-			this.isLeftHand = false;
-
-			switch (cameraTransformType) {
-			case FIRST_PERSON_LEFT_HAND:
-				this.isFirstPersonView = this.isLeftHand = true;
-				break;
-			case FIRST_PERSON_RIGHT_HAND:
-				this.isFirstPersonView = true;
-				break;
-			case THIRD_PERSON_LEFT_HAND:
-				this.isThirdPersonView = this.isLeftHand = true;
-				break;
-			case THIRD_PERSON_RIGHT_HAND:
-				this.isThirdPersonView = true;
-				break;
-			default:
-				break;
-			}
 		}
 
 		public boolean isBlinkingA() {

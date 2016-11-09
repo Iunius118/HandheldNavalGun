@@ -45,7 +45,7 @@ public class HandheldNavalGun {
 
 	public static final String MOD_ID = "handheldnavalgun";
 	public static final String MOD_NAME = "HandheldNavalGun";
-	public static final String MOD_VERSION = "0.0.2 beta";
+	public static final String MOD_VERSION = "0.0.3-beta";
 	public static final String MOD_DEPENDENCIES = "required-after:Forge@[1.10.2-12.18.2.2099,)";
 	public static final String MOD_ACCEPTED_MC_VERSIONS = "[1.10.2,]";
 
@@ -62,7 +62,9 @@ public class HandheldNavalGun {
 	@SideOnly(Side.CLIENT)
 	public Vec3d vec3Marker;
 	@SideOnly(Side.CLIENT)
-	public ModelItemGun127mmType89Single modelGunPart;
+	public ModelItemGun127mmType89Single modelGunPartMainHand;
+	@SideOnly(Side.CLIENT)
+	public ModelItemGun127mmType89Single modelGunPartOffHand;
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event){
@@ -74,7 +76,8 @@ public class HandheldNavalGun {
 
 		if (event.getSide().isClient()) {
 			this.rangeKeeper = new RangeKeeperGun127mmType89();
-			this.modelGunPart = new ModelItemGun127mmType89Single();
+			this.modelGunPartMainHand = new ModelItemGun127mmType89Single();
+			this.modelGunPartOffHand = new ModelItemGun127mmType89Single();
 			OBJLoader.INSTANCE.addDomain(MOD_ID);
 			HandheldNavalGunClientRegistry.registerItemModels();
 			MinecraftForge.EVENT_BUS.register(ClientEventHandler.INSTANCE);
@@ -127,6 +130,12 @@ public class HandheldNavalGun {
 		public static final ResourceLocation RL_OBJ_ITEM_GUN_127MM_TYPE89_SINGLE = new ResourceLocation(HandheldNavalGun.MOD_ID + ":item/gun_127mm_type89_1.obj");
 
 		public static final ModelResourceLocation MRL_ITEM_ROUND_127MM_AAC = new ModelResourceLocation(HandheldNavalGun.MOD_ID + ":round_127mm_aac", "inventory");
+	}
+
+	@SideOnly(Side.CLIENT)
+	public static class TextureLocations {
+		public static final ResourceLocation TEX_MOB_CREW_MAIN_HAND = new ResourceLocation(HandheldNavalGun.MOD_ID, "entity/mob_crew_mh");
+		public static final ResourceLocation TEX_MOB_CREW_OFF_HAND = new ResourceLocation(HandheldNavalGun.MOD_ID, "entity/mob_crew_oh");
 	}
 
 	@SubscribeEvent

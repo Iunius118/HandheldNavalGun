@@ -1,6 +1,7 @@
 package iunius118.mods.handheldnavalgun.client;
 
 import com.google.common.base.Function;
+import com.google.common.collect.ImmutableMap;
 
 import iunius118.mods.handheldnavalgun.HandheldNavalGun;
 import iunius118.mods.handheldnavalgun.client.model.ModelBakedItemOBJ;
@@ -45,7 +46,8 @@ public class HandheldNavalGunClientRegistry {
 
 	@SideOnly(Side.CLIENT)
 	public static void registerSprites(TextureStitchEvent.Pre event) {
-		event.getMap().registerSprite(new ResourceLocation(HandheldNavalGun.MOD_ID, "entity/mob_crew"));
+		event.getMap().registerSprite(HandheldNavalGun.TextureLocations.TEX_MOB_CREW_MAIN_HAND);
+		event.getMap().registerSprite(HandheldNavalGun.TextureLocations.TEX_MOB_CREW_OFF_HAND);
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -55,7 +57,8 @@ public class HandheldNavalGunClientRegistry {
 
 		try {
 			IModel model = ModelLoaderRegistry.getModel(HandheldNavalGun.ModelLocations.RL_OBJ_ITEM_GUN_127MM_TYPE89_SINGLE);
-			HandheldNavalGun.INSTANCE.modelGunPart.registerModel((OBJModel)model);
+			HandheldNavalGun.INSTANCE.modelGunPartMainHand.registerModel((OBJModel)model);
+			HandheldNavalGun.INSTANCE.modelGunPartOffHand.registerModel((OBJModel)((OBJModel)model).retexture(ImmutableMap.of("#" + HandheldNavalGun.TextureLocations.TEX_MOB_CREW_MAIN_HAND.toString(), HandheldNavalGun.TextureLocations.TEX_MOB_CREW_OFF_HAND.toString())));
 			Function<ResourceLocation, TextureAtlasSprite> spriteGetter = resource -> Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(resource.toString());
 			modelOBJ = (OBJBakedModel)model.bake(model.getDefaultState(), DefaultVertexFormats.ITEM, spriteGetter);
 		} catch (Exception e) {

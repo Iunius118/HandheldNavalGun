@@ -18,4 +18,4 @@ map_Kd blocks/redstone_block
 
 newmtl mat_crew
 Kd 1.00000 1.00000 1.00000
-map_Kd handheldnavalgun:entity/mob_crew
+map_Kd handheldnavalgun:entity/mob_crew_mh
