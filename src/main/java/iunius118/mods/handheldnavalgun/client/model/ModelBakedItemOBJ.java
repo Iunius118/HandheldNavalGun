@@ -83,9 +83,13 @@ public class ModelBakedItemOBJ implements IPerspectiveAwareModel {
 			public IBakedModel handleItemState(IBakedModel originalModel, ItemStack stack, World world, EntityLivingBase entity) {
 				if (originalModel instanceof ModelBakedItemOBJ) {
 					ModelBakedItemOBJ model = (ModelBakedItemOBJ)originalModel;
-					model.item = stack;
-					model.worldObj = world;
-					model.player = entity;
+
+					if (entity != null) {
+						model.item = stack;
+						model.worldObj = world;
+						model.player = entity;
+					}
+
 					return model;
 				}
 
