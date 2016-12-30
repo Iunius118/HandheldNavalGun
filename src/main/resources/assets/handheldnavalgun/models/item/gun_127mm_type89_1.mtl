@@ -1,4 +1,4 @@
-# Created by Metasequoia
+# Copyright 2016 Iunius118
 
 newmtl mat_warship
 Kd 1.00000 1.00000 1.00000
@@ -18,4 +18,4 @@ map_Kd blocks/redstone_block
 
 newmtl mat_crew
 Kd 1.00000 1.00000 1.00000
-map_Kd handheldnavalgun:entity/mob_crew_mh
+map_Kd handheldnavalgun:entity/mob_crew

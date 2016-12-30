@@ -38,15 +38,15 @@ import net.minecraftforge.oredict.OreDictionary;
 @Mod(modid = HandheldNavalGun.MOD_ID,
 	name = HandheldNavalGun.MOD_NAME,
 	version = HandheldNavalGun.MOD_VERSION,
-	dependencies = HandheldNavalGun.MOD_DEPENDENCIES,
+//	dependencies = HandheldNavalGun.MOD_DEPENDENCIES,
 	acceptedMinecraftVersions = HandheldNavalGun.MOD_ACCEPTED_MC_VERSIONS,
 	useMetadata = true)
 public class HandheldNavalGun {
 
 	public static final String MOD_ID = "handheldnavalgun";
 	public static final String MOD_NAME = "HandheldNavalGun";
-	public static final String MOD_VERSION = "0.0.4-beta";
-	public static final String MOD_DEPENDENCIES = "required-after:Forge@[1.10.2-12.18.2.2099,)";
+	public static final String MOD_VERSION = "0.0.4";
+//	public static final String MOD_DEPENDENCIES = "required-after:Forge@[12.18.2.2099,)";
 	public static final String MOD_ACCEPTED_MC_VERSIONS = "[1.10.2,]";
 
 	@Mod.Instance(MOD_ID)
@@ -134,6 +134,7 @@ public class HandheldNavalGun {
 
 	@SideOnly(Side.CLIENT)
 	public static class TextureLocations {
+		public static final ResourceLocation TEX_MOB_CREW = new ResourceLocation(HandheldNavalGun.MOD_ID, "entity/mob_crew");
 		public static final ResourceLocation TEX_MOB_CREW_MAIN_HAND = new ResourceLocation(HandheldNavalGun.MOD_ID, "entity/mob_crew_mh");
 		public static final ResourceLocation TEX_MOB_CREW_OFF_HAND = new ResourceLocation(HandheldNavalGun.MOD_ID, "entity/mob_crew_oh");
 	}

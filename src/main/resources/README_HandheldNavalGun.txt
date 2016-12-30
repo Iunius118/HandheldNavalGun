@@ -1,7 +1,6 @@
 ﻿
 
-	HandheldNavalGun 0.0.3 beta
-
+	HandheldNavalGun 0.0.4
 
 
 ・このmodについて
@@ -13,7 +12,7 @@
 
 	Java 8
 	Minecraft 1.10.2
-	Minecraft Forge 1.10.2-12.18.2.2099-
+	Minecraft Forge 1.10.2-12.18.3.2185-
 
 
 ・インストール方法
