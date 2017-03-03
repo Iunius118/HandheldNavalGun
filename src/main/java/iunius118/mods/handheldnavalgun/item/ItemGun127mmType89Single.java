@@ -41,7 +41,7 @@ public class ItemGun127mmType89Single extends Item {
 	public static final String TAG_RELOAD_TIME = "reload";
 	public static final String TAG_IS_RELOADABLE = "reloadable";
 	public static final int RELOAD_TIME = 80;
-	public static final int RELOAD_STARTING_TIME = 60;
+	public static final int RELOAD_STARTING_TIME = 50;
 
 	public ItemGun127mmType89Single() {
 		super();
@@ -267,20 +267,20 @@ public class ItemGun127mmType89Single extends Item {
 	 *  S(cap= 0, nbt= 0 T), C(cap= 0 ,nbt= 0 T) sync NBT and renew Client ItemStack
 	 *
 	 *  * Not Reload-able
-	 *   SHOT, +1 and +59
-	 *  S(cap=60, nbt=80 F), C(cap=61, nbt= 0 F) at onUpdate
-	 *  S(cap=60, nbt=60 F), C(cap=61, nbt= 0 F) update Server NBT at onUpdate
+	 *   SHOT, +1 and +29
+	 *  S(cap=50, nbt=80 F), C(cap=51, nbt= 0 F) at onUpdate
+	 *  S(cap=50, nbt=50 F), C(cap=51, nbt= 0 F) update Server NBT at onUpdate
 	 *   +1
-	 *  S(cap=60, nbt=60 F), C(cap= 0 ,nbt=60 F) sync NBT and renew Client ItemStack
-	 *  S(cap=60, nbt=60 F), C(cap=60, nbt= 0 F) update Client capability at onUpdate
+	 *  S(cap=50, nbt=50 F), C(cap= 0 ,nbt=50 F) sync NBT and renew Client ItemStack
+	 *  S(cap=50, nbt=50 F), C(cap=50, nbt= 0 F) update Client capability at onUpdate
 	 *
 	 *  * Reload late
-	 *  S(cap=60, nbt=60 T), C(cap=60, nbt= 0 F) RELOAD and update Server NBT and capability at onItemRightClick
+	 *  S(cap=50, nbt=50 T), C(cap=50, nbt= 0 F) RELOAD and update Server NBT and capability at onItemRightClick
 	 *   +1
-	 *  S(cap=60, nbt=60 F), C(cap= 0 ,nbt=60 T) sync NBT and renew Client ItemStack
-	 *  S(cap=59, nbt=60 T), C(cap= 0, nbt=60 T) progress reload time at onUpdate
-	 *  S(cap=59, nbt=60 T), C(cap=60, nbt= 0 T) update Client capability at onUpdate
-	 *   +58
+	 *  S(cap=50, nbt=50 F), C(cap= 0 ,nbt=50 T) sync NBT and renew Client ItemStack
+	 *  S(cap=49, nbt=50 T), C(cap= 0, nbt=50 T) progress reload time at onUpdate
+	 *  S(cap=49, nbt=50 T), C(cap=50, nbt= 0 T) update Client capability at onUpdate
+	 *   +48
 	 *  S(cap= 1, nbt=60 T), C(cap= 2, nbt= 0 T) at onUpdate
 	 *  S(cap= 1, nbt= 0 T), C(cap= 2, nbt= 0 T) update Server NBT at onUpdate
 	 *   +1

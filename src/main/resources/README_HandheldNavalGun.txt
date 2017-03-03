@@ -1,6 +1,6 @@
 ﻿
 
-	HandheldNavalGun 0.0.4
+	HandheldNavalGun 0.0.5
 
 
 ・このmodについて

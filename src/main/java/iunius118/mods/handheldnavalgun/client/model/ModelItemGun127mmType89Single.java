@@ -243,6 +243,8 @@ public class ModelItemGun127mmType89Single {
 					double d = 5.0 - (rt - 50.0);
 					GlStateManager.translate(-0.0625, -d / 16.0, -0.02);
 					isRendering = true;
+				} else if (!context.getValue().isReloadable) {
+					// Not Reload-able: not render
 				} else if (t > 35) {
 					// 50-35 on tray
 					isRendering = true;
@@ -278,8 +280,8 @@ public class ModelItemGun127mmType89Single {
 				int t = context.getValue().reloadTick;
 				float rt = t - Animation.getPartialTickTime();
 
-				if (t <= 1 || t > 50) {
-					// 80-50 not render
+				if (t <= 1 || t > 50 || !context.getValue().isReloadable) {
+					// 80-50, Not Reload-able: not render
 				} else if (t > 35) {
 					// 50-35 on tray
 					context.getKey().renderPart(context);
@@ -523,8 +525,8 @@ public class ModelItemGun127mmType89Single {
 			float rt = t - Animation.getPartialTickTime();
 			Vec3d offset = context.getKey().offset;
 
-			if (t <= 1 || t >= 60) {
-				// 80-60 home position
+			if (t <= 1 || t >= 60 || !context.getValue().isReloadable) {
+				// 80-60, Not Reload-able: home position
 				float f = MathHelper.sin(Animation.getWorldTime(Minecraft.getMinecraft().theWorld, Animation.getPartialTickTime()) % 4 * (float)Math.PI / 2) * 2;
 				GlStateManager.translate(offset.xCoord, offset.yCoord, offset.zCoord - 0.003125);
 				GlStateManager.rotate(-15 + f, 1, 0, 0);
@@ -580,8 +582,8 @@ public class ModelItemGun127mmType89Single {
 			float rt = t - Animation.getPartialTickTime();
 			Vec3d offset = context.getKey().offset;
 
-			if (t <= 1 || t >= 60) {
-				// 80-60 home position
+			if (t <= 1 || t >= 60 || !context.getValue().isReloadable) {
+				// 80-60, Not Reload-able: home position
 				float f = MathHelper.sin(Animation.getWorldTime(Minecraft.getMinecraft().theWorld, Animation.getPartialTickTime()) % 4 * (float)Math.PI / 2) * 2;
 				GlStateManager.translate(offset.xCoord, offset.yCoord, offset.zCoord + 0.003125);
 				GlStateManager.rotate(15 - f, 1, 0, 0);

@@ -3,6 +3,7 @@ package iunius118.mods.handheldnavalgun.client.renderer;
 import iunius118.mods.handheldnavalgun.HandheldNavalGun;
 import iunius118.mods.handheldnavalgun.capability.CapabilityReloadTime;
 import iunius118.mods.handheldnavalgun.client.model.ModelBakedItemOBJ;
+import iunius118.mods.handheldnavalgun.item.ItemGun127mmType89Single;
 import iunius118.mods.handheldnavalgun.tileentity.TileEntityItemGun127mmType89Single;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
@@ -46,6 +47,7 @@ public class RenderItemGun127mmType89Single extends TileEntitySpecialRenderer<Ti
 		public boolean isThirdPersonView;
 		public boolean isRightHand;
 		public boolean isMainHand;
+		public boolean isReloadable;
 		public float playerPitch;
 		public ItemStack stack;
 
@@ -56,6 +58,7 @@ public class RenderItemGun127mmType89Single extends TileEntitySpecialRenderer<Ti
 			this.isThirdPersonView = false;
 			this.isRightHand = false;
 			this.isMainHand = false;
+			this.isReloadable = false;
 
 			switch (cameraTransformType) {
 			case FIRST_PERSON_LEFT_HAND:
@@ -77,6 +80,13 @@ public class RenderItemGun127mmType89Single extends TileEntitySpecialRenderer<Ti
 			if (item != null) {
 				CapabilityReloadTime.IReloadTimeICapability cap = item.getCapability(HandheldNavalGun.Capabilities.getReloadTimeICapability(), null);
 				this.reloadTick = (cap != null) ? cap.getReloadTime() : 0;
+
+				NBTTagCompound tag = item.getTagCompound();
+
+				if (tag != null) {
+					this.isReloadable = tag.getBoolean(ItemGun127mmType89Single.TAG_IS_RELOADABLE);
+				}
+
 			} else {
 				this.reloadTick = 0;
 			}
