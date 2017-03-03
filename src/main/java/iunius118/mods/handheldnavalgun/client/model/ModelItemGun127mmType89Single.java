@@ -123,9 +123,8 @@ public class ModelItemGun127mmType89Single {
 	/* Reload Animation
 	 *
 	 * 80-75 recoil and draw rammer
-	 * 75-60 counter-recoil (75-70 release breech, 75-65 eject cartridge)
-	 * 60-59 counter-recoil completed
-	 * 59-45 set round (59-50) on tray (50-)
+	 * 75-60 counter-recoil (75-70 release breech)
+	 * 60-45 eject cartridge (60-50) and set round (59-50) on tray (50-)
 	 * 45-35 push tray
 	 * 35-15 load round and push rammer
 	 * 15-05 draw tray
@@ -230,13 +229,20 @@ public class ModelItemGun127mmType89Single {
 
 				if (t <= 1 || t > 75) {
 					// 80-75 not render
-				} else if (t > 65) {
-					// 75-65 eject empty cartridge
-					double d = 10.0 - (rt - 65.0);
-					GlStateManager.translate(-0.0625, -d / 32.0, -0.04);
+				} else if (t > 60) {
+					// 75-60 empty cartridge in breech
+					GlStateManager.translate(-0.0625, 0,  (rt - 60.0) / 480.0 - 0.078125);
+					isRendering = true;
+				} else if (t > 55) {
+					// 60-55 eject empty cartridge
+					double d = rt - 55.0;
+					GlStateManager.translate(-0.0625, 0, -0.02 - 0.011625 * d);
 					isRendering = true;
 				} else if (t > 50) {
-					// 65-50 not render
+					// 55-50 falling empty cartridge
+					double d = 5.0 - (rt - 50.0);
+					GlStateManager.translate(-0.0625, -d / 16.0, -0.02);
+					isRendering = true;
 				} else if (t > 35) {
 					// 50-35 on tray
 					isRendering = true;
