@@ -9,105 +9,128 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.Capability.IStorage;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 
-public class CapabilityReloadTime {
+public class CapabilityReloadTime
+{
 
-	public static class Provider implements IReloadTimeICapability, ICapabilityProvider {
+    public static class Provider implements IReloadTimeICapability, ICapabilityProvider
+    {
 
-		private int reloadTime;
+        private int reloadTime;
 
-		public Provider() {
-			this(0);
-		}
+        public Provider()
+        {
+            this(0);
+        }
 
-		public Provider(int ticks) {
-			this.setReloadTime(ticks);
-		}
+        public Provider(int ticks)
+        {
+            this.setReloadTime(ticks);
+        }
 
-		@Override
-		public int setReloadTime(int ticks) {
-			this.reloadTime = ticks;
-			return ticks;
-		}
+        @Override
+        public int setReloadTime(int ticks)
+        {
+            this.reloadTime = ticks;
+            return ticks;
+        }
 
-		@Override
-		public int getReloadTime() {
-			return this.reloadTime;
-		}
+        @Override
+        public int getReloadTime()
+        {
+            return this.reloadTime;
+        }
 
-		@Override
-		public int progress(boolean isReloadable, int timeReload) {
-			--this.reloadTime;
+        @Override
+        public int progress(boolean isReloadable, int timeReload)
+        {
+            --this.reloadTime;
 
-			if (isReloadable) {
-				if (this.reloadTime < 0) this.reloadTime = 0;
-			}  else {
-				if (this.reloadTime < timeReload) this.reloadTime = timeReload;
-			}
+            if (isReloadable)
+            {
+                if (this.reloadTime < 0) this.reloadTime = 0;
+            }
+            else
+            {
+                if (this.reloadTime < timeReload) this.reloadTime = timeReload;
+            }
 
-			return this.reloadTime;
-		}
+            return this.reloadTime;
+        }
 
-		@Override
-		public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
-			return HandheldNavalGun.Capabilities.getReloadTimeICapability() != null && HandheldNavalGun.Capabilities.getReloadTimeICapability() == capability;
-		}
+        @Override
+        public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing)
+        {
+            return HandheldNavalGun.Capabilities.getReloadTimeICapability() != null && HandheldNavalGun.Capabilities.getReloadTimeICapability() == capability;
+        }
 
-		@Override
-		@Nullable
-		public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
-			if (hasCapability(capability, facing)) {
-				Capability<IReloadTimeICapability> reloadTimeICapability = HandheldNavalGun.Capabilities.getReloadTimeICapability();
+        @Override
+        @Nullable
+        public <T> T getCapability(Capability<T> capability,
+                @Nullable EnumFacing facing)
+        {
+            if (hasCapability(capability, facing))
+            {
+                Capability<IReloadTimeICapability> reloadTimeICapability = HandheldNavalGun.Capabilities .getReloadTimeICapability();
 
-				if (reloadTimeICapability != null) {
-					return reloadTimeICapability.cast(this);
-				}
-			}
+                if (reloadTimeICapability != null)
+                {
+                    return reloadTimeICapability.cast(this);
+                }
+            }
 
-			return null;
-		}
-	}
+            return null;
+        }
+    }
 
-	public static class DefaultImpl implements IReloadTimeICapability {
+    public static class DefaultImpl implements IReloadTimeICapability
+    {
 
-		@Override
-		public int setReloadTime(int ticks) {
-			return 0;
-		}
+        @Override
+        public int setReloadTime(int ticks)
+        {
+            return 0;
+        }
 
-		@Override
-		public int getReloadTime() {
-			return 0;
-		}
+        @Override
+        public int getReloadTime()
+        {
+            return 0;
+        }
 
-		@Override
-		public int progress(boolean isReloadable, int timeReload) {
-			return 0;
-		}
+        @Override
+        public int progress(boolean isReloadable, int timeReload)
+        {
+            return 0;
+        }
 
-	}
+    }
 
-	public static class Storage implements IStorage<IReloadTimeICapability> {
+    public static class Storage implements IStorage<IReloadTimeICapability>
+    {
 
-		@Override
-		public NBTBase writeNBT(Capability<IReloadTimeICapability> capability, IReloadTimeICapability instance, EnumFacing side) {
-			return null;
-		}
+        @Override
+        public NBTBase writeNBT(Capability<IReloadTimeICapability> capability, IReloadTimeICapability instance, EnumFacing side)
+        {
+            return null;
+        }
 
-		@Override
-		public void readNBT(Capability<IReloadTimeICapability> capability, IReloadTimeICapability instance, EnumFacing side, NBTBase nbt) {
+        @Override
+        public void readNBT(Capability<IReloadTimeICapability> capability, IReloadTimeICapability instance, EnumFacing side, NBTBase nbt)
+        {
 
-		}
+        }
 
-	}
+    }
 
-	public static interface IReloadTimeICapability {
+    public static interface IReloadTimeICapability
+    {
 
-		public int setReloadTime(int ticks);
+        public int setReloadTime(int ticks);
 
-		public int getReloadTime();
+        public int getReloadTime();
 
-		public int progress(boolean isReloadable, int timeReload);
+        public int progress(boolean isReloadable, int timeReload);
 
-	}
+    }
 
 }

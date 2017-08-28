@@ -9,12 +9,14 @@ import javax.annotation.Nullable;
 import iunius118.mods.handheldnavalgun.capability.CapabilityReloadTime;
 import iunius118.mods.handheldnavalgun.client.ClientEventHandler;
 import iunius118.mods.handheldnavalgun.client.HandheldNavalGunClientRegistry;
-import iunius118.mods.handheldnavalgun.client.RangeKeeperGun127mmType89;
+import iunius118.mods.handheldnavalgun.client.gunfirecontrolsystem.GunFireControlSystemGun127mmType89;
 import iunius118.mods.handheldnavalgun.client.model.ModelItemGun127mmType89Single;
 import iunius118.mods.handheldnavalgun.item.ItemGun127mmType89Single;
 import iunius118.mods.handheldnavalgun.item.ItemRound127mmAntiAircraftCommon;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -31,119 +33,174 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.oredict.OreDictionary;
+import net.minecraftforge.oredict.ShapedOreRecipe;
 
-@Mod(modid = HandheldNavalGun.MOD_ID,
-	name = HandheldNavalGun.MOD_NAME,
-	version = HandheldNavalGun.MOD_VERSION,
-//	dependencies = HandheldNavalGun.MOD_DEPENDENCIES,
-	acceptedMinecraftVersions = HandheldNavalGun.MOD_ACCEPTED_MC_VERSIONS,
-	useMetadata = true)
-public class HandheldNavalGun {
+@Mod(modid = HandheldNavalGun.MOD_ID, name = HandheldNavalGun.MOD_NAME, version = HandheldNavalGun.MOD_VERSION,
+        dependencies = HandheldNavalGun.MOD_DEPENDENCIES,
+        acceptedMinecraftVersions = HandheldNavalGun.MOD_ACCEPTED_MC_VERSIONS, useMetadata = true)
+public class HandheldNavalGun
+{
 
-	public static final String MOD_ID = "handheldnavalgun";
-	public static final String MOD_NAME = "HandheldNavalGun";
-	public static final String MOD_VERSION = "0.0.5";
-//	public static final String MOD_DEPENDENCIES = "required-after:Forge@[12.18.2.2099,)";
-	public static final String MOD_ACCEPTED_MC_VERSIONS = "[1.10.2,]";
+    public static final String MOD_ID = "handheldnavalgun";
+    public static final String MOD_NAME = "HandheldNavalGun";
+    public static final String MOD_VERSION = "%MOD_VERSION%";
+    public static final String MOD_DEPENDENCIES = "required-after:forge@[12.18.2.2099,)";
+    public static final String MOD_ACCEPTED_MC_VERSIONS = "[1.10.2,]";
 
-	@Mod.Instance(MOD_ID)
-	public static HandheldNavalGun INSTANCE;
+    @Mod.Instance(MOD_ID)
+    public static HandheldNavalGun INSTANCE;
 
-	public Map<String, Integer> mapShell = new HashMap<>();
-	public Item itemCartridge = net.minecraft.init.Items.IRON_INGOT;
+    public Map<String, Integer> mapShell = new HashMap<>();
+    public ItemStack itemCartridge = new ItemStack(net.minecraft.init.Items.IRON_INGOT);
 
-	@SideOnly(Side.CLIENT)
-	public RangeKeeperGun127mmType89 rangeKeeper;
-	@SideOnly(Side.CLIENT)
-	public Vec3d vec3Target;
-	@SideOnly(Side.CLIENT)
-	public Vec3d vec3Marker;
-	@SideOnly(Side.CLIENT)
-	public ModelItemGun127mmType89Single modelGunPartMainHand;
-	@SideOnly(Side.CLIENT)
-	public ModelItemGun127mmType89Single modelGunPartOffHand;
+    @SideOnly(Side.CLIENT)
+    public GunFireControlSystemGun127mmType89 gunFireControlSystem;
+    @SideOnly(Side.CLIENT)
+    public Vec3d vec3Target;
+    @SideOnly(Side.CLIENT)
+    public Vec3d vec3Marker;
+    @SideOnly(Side.CLIENT)
+    public ModelItemGun127mmType89Single modelGunPartMainHand;
+    @SideOnly(Side.CLIENT)
+    public ModelItemGun127mmType89Single modelGunPartOffHand;
 
-	@EventHandler
-	public void preInit(FMLPreInitializationEvent event){
-		HandheldNavalGunRegistry.registerMessage();
-		HandheldNavalGunRegistry.registerCapabilities();
-		HandheldNavalGunRegistry.registerItems();
-		HandheldNavalGunRegistry.resisterEntities();
-		MinecraftForge.EVENT_BUS.register(this);
+    @EventHandler
+    public void preInit(FMLPreInitializationEvent event)
+    {
+        HandheldNavalGunRegistry.registerMessage();
+        HandheldNavalGunRegistry.registerCapabilities();
+        registerItems();
+        registerRecipes();
+        HandheldNavalGunRegistry.resisterEntities();
+        MinecraftForge.EVENT_BUS.register(this);
 
-		if (event.getSide().isClient()) {
-			this.rangeKeeper = new RangeKeeperGun127mmType89();
-			this.modelGunPartMainHand = new ModelItemGun127mmType89Single();
-			this.modelGunPartOffHand = new ModelItemGun127mmType89Single();
-			OBJLoader.INSTANCE.addDomain(MOD_ID);
-			HandheldNavalGunClientRegistry.registerItemModels();
-			MinecraftForge.EVENT_BUS.register(ClientEventHandler.INSTANCE);
-		}
-	}
+        if (event.getSide().isClient())
+        {
+            this.gunFireControlSystem = new GunFireControlSystemGun127mmType89();
+            this.modelGunPartMainHand = new ModelItemGun127mmType89Single();
+            this.modelGunPartOffHand = new ModelItemGun127mmType89Single();
+            OBJLoader.INSTANCE.addDomain(MOD_ID);
+            HandheldNavalGunClientRegistry.registerItemModels();
+            MinecraftForge.EVENT_BUS.register(ClientEventHandler.INSTANCE);
+        }
+    }
 
-	@EventHandler
-	public void postInit(FMLPostInitializationEvent event){
-		List<ItemStack> list = OreDictionary.getOres("ingotBrass");
+    @EventHandler
+    public void postInit(FMLPostInitializationEvent event)
+    {
+        List<ItemStack> list = OreDictionary.getOres("ingotBrass");
 
-		if (!list.isEmpty()) {
-			this.itemCartridge = list.get(0).getItem();
-		}
-	}
+        if (!list.isEmpty())    // if brass ingot exists...
+        {
+            // save a copy stack of brass ingot for empty cartridge item
+            this.itemCartridge = list.get(0).copy();
+        }
+    }
 
-	public static class PacketHandler {
-		public static final SimpleNetworkWrapper INSTANCE = NetworkRegistry.INSTANCE.newSimpleChannel(HandheldNavalGun.MOD_ID);
-	}
+    public static class PacketHandler
+    {
+        public static final SimpleNetworkWrapper INSTANCE = NetworkRegistry.INSTANCE.newSimpleChannel(HandheldNavalGun.MOD_ID);
+    }
 
-	public static class Capabilities {
-		@CapabilityInject(CapabilityReloadTime.IReloadTimeICapability.class)
-		private static Capability<CapabilityReloadTime.IReloadTimeICapability> RELOAD_TIMEI_CAPABILITY = null;
+    public static class Capabilities
+    {
+        @CapabilityInject(CapabilityReloadTime.IReloadTimeICapability.class)
+        private static Capability<CapabilityReloadTime.IReloadTimeICapability> RELOAD_TIMEI_CAPABILITY = null;
 
-		public static final String NAME_RELOAD_TIMEI_CAPABILITY = "reload_timei_capability";
+        public static final String NAME_RELOAD_TIMEI_CAPABILITY = "reload_timei_capability";
 
-		@Nullable
-		public static Capability<CapabilityReloadTime.IReloadTimeICapability> getReloadTimeICapability() {
-			return RELOAD_TIMEI_CAPABILITY;
-		}
-	}
+        @Nullable
+        public static Capability<CapabilityReloadTime.IReloadTimeICapability> getReloadTimeICapability()
+        {
+            return RELOAD_TIMEI_CAPABILITY;
+        }
+    }
 
-	public static class Items {
-		public static final String NAME_ITEM_GUN_127MM_TYPE89_SINGLE = "handheldnavalgun.gun_127mm_type89_1";
-		public static final Item GUN_127MM_TYPE89_SINGLE  = new ItemGun127mmType89Single()
-				.setRegistryName(HandheldNavalGun.Items.NAME_ITEM_GUN_127MM_TYPE89_SINGLE)
-				.setUnlocalizedName(HandheldNavalGun.Items.NAME_ITEM_GUN_127MM_TYPE89_SINGLE)
-				.setCreativeTab(CreativeTabs.COMBAT)
-				.setMaxStackSize(1);
+    public static class ITEMS
+    {
+        public static final String NAME_ITEM_GUN_127MM_TYPE89_SINGLE = "handheldnavalgun.gun_127mm_type89_1";
+        public static final String NAME_ITEM_ROUND_127MM_AAC = "handheldnavalgun.round_127mm_aac";
 
-		public static final String NAME_ITEM_ROUND_127MM_AAC = "handheldnavalgun.round_127mm_aac";
-		public static final Item ROUND_127MM_AAC  = new ItemRound127mmAntiAircraftCommon()
-				.setRegistryName(HandheldNavalGun.Items.NAME_ITEM_ROUND_127MM_AAC)
-				.setUnlocalizedName(HandheldNavalGun.Items.NAME_ITEM_ROUND_127MM_AAC)
-				.setCreativeTab(CreativeTabs.COMBAT);
-	}
+        public static final Item GUN_127MM_TYPE89_SINGLE = new ItemGun127mmType89Single()
+                .setRegistryName(HandheldNavalGun.ITEMS.NAME_ITEM_GUN_127MM_TYPE89_SINGLE)
+                .setUnlocalizedName(HandheldNavalGun.ITEMS.NAME_ITEM_GUN_127MM_TYPE89_SINGLE)
+                .setCreativeTab(CreativeTabs.COMBAT)
+                .setMaxStackSize(1);
 
-	@SideOnly(Side.CLIENT)
-	public static class ModelLocations {
-		public static final ModelResourceLocation MRL_ITEM_GUN_127MM_TYPE89_SINGLE = new ModelResourceLocation(HandheldNavalGun.MOD_ID + ":gun_127mm_type89_1", "inventory");
-		public static final ResourceLocation RL_OBJ_ITEM_GUN_127MM_TYPE89_SINGLE = new ResourceLocation(HandheldNavalGun.MOD_ID + ":item/gun_127mm_type89_1.obj");
+        public static final Item ROUND_127MM_AAC = new ItemRound127mmAntiAircraftCommon()
+                .setRegistryName(HandheldNavalGun.ITEMS.NAME_ITEM_ROUND_127MM_AAC)
+                .setUnlocalizedName(HandheldNavalGun.ITEMS.NAME_ITEM_ROUND_127MM_AAC)
+                .setCreativeTab(CreativeTabs.COMBAT);
+    }
 
-		public static final ModelResourceLocation MRL_ITEM_ROUND_127MM_AAC = new ModelResourceLocation(HandheldNavalGun.MOD_ID + ":round_127mm_aac", "inventory");
-	}
+    public static void registerItems()
+    {
+        GameRegistry.register(ITEMS.GUN_127MM_TYPE89_SINGLE);
+        GameRegistry.register(ITEMS.ROUND_127MM_AAC);
+    }
 
-	@SideOnly(Side.CLIENT)
-	public static class TextureLocations {
-		public static final ResourceLocation TEX_MOB_CREW = new ResourceLocation(HandheldNavalGun.MOD_ID, "entity/mob_crew");
-		public static final ResourceLocation TEX_MOB_CREW_MAIN_HAND = new ResourceLocation(HandheldNavalGun.MOD_ID, "entity/mob_crew_mh");
-		public static final ResourceLocation TEX_MOB_CREW_OFF_HAND = new ResourceLocation(HandheldNavalGun.MOD_ID, "entity/mob_crew_oh");
-	}
+    public static void registerRecipes()
+    {
+        GameRegistry.addRecipe(new ShapedOreRecipe(
+                new ItemStack(HandheldNavalGun.ITEMS.GUN_127MM_TYPE89_SINGLE),
+                "ii ",
+                "gii",
+                "cS ",
+                'i', "ingotIron",
+                'g', "paneGlass",
+                'c', Items.CLOCK,
+                'S', Blocks.STICKY_PISTON));
 
-	@SubscribeEvent
-	public void onItemStackLoad(AttachCapabilitiesEvent.Item event) {
-		if (event.getItem() instanceof ItemGun127mmType89Single) {
-			event.addCapability(new ResourceLocation(HandheldNavalGun.MOD_ID, Capabilities.NAME_RELOAD_TIMEI_CAPABILITY), new CapabilityReloadTime.Provider());
-		}
-	}
+        GameRegistry.addRecipe(new ShapedOreRecipe(
+                new ItemStack(HandheldNavalGun.ITEMS.ROUND_127MM_AAC, 16),
+                " c ",
+                "ITI",
+                "ITI",
+                'c', Items.CLOCK,
+                'I', "blockIron",
+                'T', Blocks.TNT));
+
+        GameRegistry.addRecipe(new ShapedOreRecipe(
+                new ItemStack(HandheldNavalGun.ITEMS.ROUND_127MM_AAC, 16),
+                " c ",
+                "STS",
+                "BTB",
+                'c', Items.CLOCK,
+                'S', "blockSteel",
+                'B', "blockBrass",
+                'T', Blocks.TNT));
+    }
+
+    @SideOnly(Side.CLIENT)
+    public static class ModelLocations
+    {
+        public static final ModelResourceLocation MRL_ITEM_GUN_127MM_TYPE89_SINGLE = new ModelResourceLocation(HandheldNavalGun.MOD_ID + ":gun_127mm_type89_1", "inventory");
+        public static final ResourceLocation RL_OBJ_ITEM_GUN_127MM_TYPE89_SINGLE = new ResourceLocation(HandheldNavalGun.MOD_ID + ":item/gun_127mm_type89_1.obj");
+
+        public static final ModelResourceLocation MRL_ITEM_ROUND_127MM_AAC = new ModelResourceLocation(HandheldNavalGun.MOD_ID + ":round_127mm_aac", "inventory");
+    }
+
+    @SideOnly(Side.CLIENT)
+    public static class TextureLocations
+    {
+        public static final ResourceLocation TEX_MOB_CREW = new ResourceLocation(HandheldNavalGun.MOD_ID, "entity/mob_crew");
+        public static final ResourceLocation TEX_MOB_CREW_MAIN_HAND = new ResourceLocation(HandheldNavalGun.MOD_ID, "entity/mob_crew_mh");
+        public static final ResourceLocation TEX_MOB_CREW_OFF_HAND = new ResourceLocation(HandheldNavalGun.MOD_ID, "entity/mob_crew_oh");
+    }
+
+    @SubscribeEvent
+    public void onItemStackLoad(AttachCapabilitiesEvent.Item event)
+    {
+        if (event.getItem() instanceof ItemGun127mmType89Single)
+        {
+            event.addCapability(
+                    new ResourceLocation(HandheldNavalGun.MOD_ID, Capabilities.NAME_RELOAD_TIMEI_CAPABILITY),
+                    new CapabilityReloadTime.Provider());
+        }
+    }
 
 }

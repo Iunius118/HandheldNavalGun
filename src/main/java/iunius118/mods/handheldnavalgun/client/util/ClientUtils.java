@@ -26,220 +26,263 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class ClientUtils {
-	public static final ClientUtils INSTANCE = new ClientUtils();
+public class ClientUtils
+{
+    public static final ClientUtils INSTANCE = new ClientUtils();
 
-	private int tempDisplayWidth = 1;
-	private int tempDisplayHeight = 1;
-	private int tempGuiScale = 1;
-	private int scaleFactor = 1;
+    private int tempDisplayWidth = 1;
+    private int tempDisplayHeight = 1;
+    private int tempGuiScale = 1;
+    private int scaleFactor = 1;
 
-	private static double[] v0rate;
+    private static double[] v0rate;
 
-	public ClientUtils() {
-		this.v0rate = new double[128];
+    public ClientUtils()
+    {
+        this.v0rate = new double[128];
 
-		for (int i = 0; i < this.v0rate.length; i++){
-			this.v0rate[i] = 100 * (1 - Math.exp(-0.01 * i));
-		}
-	}
+        for (int i = 0; i < this.v0rate.length; i++)
+        {
+            this.v0rate[i] = 100 * (1 - Math.exp(-0.01 * i));
+        }
+    }
 
-	public static double ticksToV0Rate(int t) {
-		if (v0rate == null) {
-			return INSTANCE.ticksToV0Rate(t);
-		}
+    public static double ticksToV0Rate(int t)
+    {
+        if (v0rate == null)
+        {
+            return INSTANCE.ticksToV0Rate(t);
+        }
 
-		double d;
+        double d;
 
-		if (t >= 0 && t < v0rate.length) {
-			d = v0rate[t];
-		} else {
-			d = 100 * (1 - Math.exp(-0.01 * t));
-		}
+        if (t >= 0 && t < v0rate.length)
+        {
+            d = v0rate[t];
+        }
+        else
+        {
+            d = 100 * (1 - Math.exp(-0.01 * t));
+        }
 
-		return d;
-	}
+        return d;
+    }
 
-	@Nullable
-	public static Vec3d getScreenPos(@Nullable Vec3d pos, float partialTicks) {
-		Entity viewEntity = Minecraft.getMinecraft().getRenderViewEntity();
+    @Nullable
+    public static Vec3d getScreenPos(@Nullable Vec3d pos, float partialTicks)
+    {
+        Entity viewEntity = Minecraft.getMinecraft().getRenderViewEntity();
 
-		if (pos != null && viewEntity != null) {
+        if (pos != null && viewEntity != null)
+        {
 
-			double x = pos.xCoord - (viewEntity.lastTickPosX + (viewEntity.posX - viewEntity.lastTickPosX) * partialTicks);
-			double y = pos.yCoord - (viewEntity.lastTickPosY + (viewEntity.posY - viewEntity.lastTickPosY) * partialTicks) - viewEntity.getEyeHeight();
-			double z = pos.zCoord - (viewEntity.lastTickPosZ + (viewEntity.posZ - viewEntity.lastTickPosZ) * partialTicks);
+            double x = pos.xCoord - (viewEntity.lastTickPosX + (viewEntity.posX - viewEntity.lastTickPosX) * partialTicks);
+            double y = pos.yCoord - (viewEntity.lastTickPosY + (viewEntity.posY - viewEntity.lastTickPosY) * partialTicks) - viewEntity.getEyeHeight();
+            double z = pos.zCoord - (viewEntity.lastTickPosZ + (viewEntity.posZ - viewEntity.lastTickPosZ) * partialTicks);
 
-			Vec3d look = viewEntity.getLook(partialTicks);
+            Vec3d look = viewEntity.getLook(partialTicks);
 
-			if (Minecraft.getMinecraft().getRenderManager().options != null && Minecraft.getMinecraft().getRenderManager().options.thirdPersonView == 2) {
-				look = look.scale(-1);
-			}
+            if (Minecraft.getMinecraft().getRenderManager().options != null && Minecraft.getMinecraft().getRenderManager().options.thirdPersonView == 2)
+            {
+                look = look.scale(-1);
+            }
 
-			if (x != 0.0D || y != 0.0D || z != 0.0D) {
-				double d = (x * look.xCoord + y * look.yCoord + z * look.zCoord) / (Math.sqrt(x * x + y * y + z * z) * look.lengthVector());
-				if (d < 0.0D) {
-					return null;
-				} else {
-					return ClientUtils.getScreenCoordsFrom3dCoords((float)x, (float)y + viewEntity.getEyeHeight(), (float)z);
-				}
-			}
-		}
+            if (x != 0.0D || y != 0.0D || z != 0.0D)
+            {
+                double d = (x * look.xCoord + y * look.yCoord + z * look.zCoord) / (Math.sqrt(x * x + y * y + z * z) * look.lengthVector());
+                if (d < 0.0D)
+                {
+                    return null;
+                }
+                else
+                {
+                    return ClientUtils.getScreenCoordsFrom3dCoords((float) x, (float) y + viewEntity.getEyeHeight(), (float) z);
+                }
+            }
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	@Nullable
-	public static Vec3d getScreenPos(float yaw, float pitch, float partialTicks) {
-		float f = MathHelper.cos(-yaw * 0.017453292F - (float)Math.PI);
-		float f1 = MathHelper.sin(-yaw * 0.017453292F - (float)Math.PI);
-		float f2 = -MathHelper.cos(-pitch * 0.017453292F);
-		float f3 = MathHelper.sin(-pitch * 0.017453292F);
-		Vec3d pos = new Vec3d(f1 * f2, f3, f * f2).scale(5.0D);
-		Entity viewEntity = Minecraft.getMinecraft().getRenderViewEntity();
+    @Nullable
+    public static Vec3d getScreenPos(float yaw, float pitch, float partialTicks)
+    {
+        float f = MathHelper.cos(-yaw * 0.017453292F - (float) Math.PI);
+        float f1 = MathHelper.sin(-yaw * 0.017453292F - (float) Math.PI);
+        float f2 = -MathHelper.cos(-pitch * 0.017453292F);
+        float f3 = MathHelper.sin(-pitch * 0.017453292F);
+        Vec3d pos = new Vec3d(f1 * f2, f3, f * f2).scale(5.0D);
+        Entity viewEntity = Minecraft.getMinecraft().getRenderViewEntity();
 
-		if (viewEntity != null) {
-			double x = pos.xCoord;
-			double y = pos.yCoord;
-			double z = pos.zCoord;
-			double lenSq = x * x + y * y + z * z;
+        if (viewEntity != null)
+        {
+            double x = pos.xCoord;
+            double y = pos.yCoord;
+            double z = pos.zCoord;
+            double lenSq = x * x + y * y + z * z;
 
-			if (lenSq < 1e-8) {
-				return null;
-			}
+            if (lenSq < 1e-8)
+            {
+                return null;
+            }
 
-			Vec3d look = viewEntity.getLook(partialTicks);
+            Vec3d look = viewEntity.getLook(partialTicks);
 
-			if (Minecraft.getMinecraft().getRenderManager().options != null && Minecraft.getMinecraft().getRenderManager().options.thirdPersonView == 2) {
-				look = look.scale(-1);
-			}
+            if (Minecraft.getMinecraft().getRenderManager().options != null && Minecraft.getMinecraft().getRenderManager().options.thirdPersonView == 2)
+            {
+                look = look.scale(-1);
+            }
 
-			double deg = Math.toDegrees(Math.acos((x * look.xCoord + y * look.yCoord + z * look.zCoord) / (Math.sqrt(lenSq) * look.lengthVector())));
+            double deg = Math.toDegrees(Math.acos((x * look.xCoord + y * look.yCoord + z * look.zCoord) / (Math.sqrt(lenSq) * look.lengthVector())));
 
-			if (deg < 90) {
-				return ClientUtils.getScreenCoordsFrom3dCoords((float)x, (float)y + viewEntity.getEyeHeight(), (float)z);
-			}
-		}
+            if (deg < 90)
+            {
+                return ClientUtils.getScreenCoordsFrom3dCoords((float) x, (float) y + viewEntity.getEyeHeight(), (float) z);
+            }
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	@Nullable
-	public static Vec3d getScreenCoordsFrom3dCoords(float x, float y, float z) {
-		IntBuffer viewport = BufferUtils.createIntBuffer(16);
-		FloatBuffer modelview = BufferUtils.createFloatBuffer(16);
-		FloatBuffer projection = BufferUtils.createFloatBuffer(16);
-		FloatBuffer screenCoords = BufferUtils.createFloatBuffer(4);
+    @Nullable
+    public static Vec3d getScreenCoordsFrom3dCoords(float x, float y, float z)
+    {
+        IntBuffer viewport = BufferUtils.createIntBuffer(16);
+        FloatBuffer modelview = BufferUtils.createFloatBuffer(16);
+        FloatBuffer projection = BufferUtils.createFloatBuffer(16);
+        FloatBuffer screenCoords = BufferUtils.createFloatBuffer(4);
 
-		GL11.glGetFloat(GL11.GL_MODELVIEW_MATRIX, modelview);
-		GL11.glGetFloat(GL11.GL_PROJECTION_MATRIX, projection);
-		GL11.glGetInteger(GL11.GL_VIEWPORT, viewport);
+        GL11.glGetFloat(GL11.GL_MODELVIEW_MATRIX, modelview);
+        GL11.glGetFloat(GL11.GL_PROJECTION_MATRIX, projection);
+        GL11.glGetInteger(GL11.GL_VIEWPORT, viewport);
 
-		boolean result = GLU.gluProject(x, y, z, modelview, projection, viewport, screenCoords);
+        boolean result = GLU.gluProject(x, y, z, modelview, projection, viewport, screenCoords);
 
-		if (result) {
-			Minecraft mc = Minecraft.getMinecraft();
-			ClientUtils cu = ClientUtils.INSTANCE;
+        if (result)
+        {
+            Minecraft mc = Minecraft.getMinecraft();
+            ClientUtils cu = ClientUtils.INSTANCE;
 
-			if (cu.tempDisplayWidth != mc.displayWidth || cu.tempDisplayHeight != mc.displayHeight || cu.tempGuiScale != mc.gameSettings.guiScale) {
-				cu.scaleFactor = new ScaledResolution(mc).getScaleFactor();
-				cu.tempDisplayWidth = mc.displayWidth;
-				cu.tempDisplayHeight = mc.displayHeight;
-				cu.tempGuiScale = mc.gameSettings.guiScale;
-			}
+            if (cu.tempDisplayWidth != mc.displayWidth || cu.tempDisplayHeight != mc.displayHeight || cu.tempGuiScale != mc.gameSettings.guiScale)
+            {
+                cu.scaleFactor = new ScaledResolution(mc).getScaleFactor();
+                cu.tempDisplayWidth = mc.displayWidth;
+                cu.tempDisplayHeight = mc.displayHeight;
+                cu.tempGuiScale = mc.gameSettings.guiScale;
+            }
 
-			return new Vec3d(screenCoords.get(0) / cu.scaleFactor, (mc.displayHeight - screenCoords.get(1)) / cu.scaleFactor, 0);
-		} else {
-			return null;
-		}
-	}
+            return new Vec3d(screenCoords.get(0) / cu.scaleFactor, (mc.displayHeight - screenCoords.get(1)) / cu.scaleFactor, 0);
+        }
+        else
+        {
+            return null;
+        }
+    }
 
-	@Nullable
-	public static RayTraceResult getMouseOver(double distance, float partialTicks) {
-		if (distance < 0.0D) {
-			return null;
-		}
+    @Nullable
+    public static RayTraceResult getMouseOver(double distance, float partialTicks)
+    {
+        if (distance < 0.0D)
+        {
+            return null;
+        }
 
-		Minecraft mc = Minecraft.getMinecraft();
-		World world = mc.theWorld;
-		Entity viewEntity = mc.getRenderViewEntity();
-		Entity pointedEntity = null;
-		RayTraceResult objectMouseOver = null;
+        Minecraft mc = Minecraft.getMinecraft();
+        World world = mc.theWorld;
+        Entity viewEntity = mc.getRenderViewEntity();
+        Entity pointedEntity = null;
+        RayTraceResult objectMouseOver = null;
 
-		if (viewEntity != null && world != null) {
-			pointedEntity = null;
-			Vec3d vec3EntityPos = null;
-			Vec3d vec3Eyes = viewEntity.getPositionEyes(partialTicks);
-			Vec3d vec3Look = viewEntity.getLook(partialTicks);
-			Vec3d vec3Reach = vec3Eyes.add(vec3Look.scale(distance));
+        if (viewEntity != null && world != null)
+        {
+            pointedEntity = null;
+            Vec3d vec3EntityPos = null;
+            Vec3d vec3Eyes = viewEntity.getPositionEyes(partialTicks);
+            Vec3d vec3Look = viewEntity.getLook(partialTicks);
+            Vec3d vec3Reach = vec3Eyes.add(vec3Look.scale(distance));
 
-			double d0 = distance;
-			Vec3d vec3EyesBlock = viewEntity.getPositionEyes(partialTicks);
-			Vec3d vec3ReachBlock = vec3EyesBlock.add(vec3Look.scale((d0 > 100.0D) ? 100.0D : d0));
+            double d0 = distance;
+            Vec3d vec3EyesBlock = viewEntity.getPositionEyes(partialTicks);
+            Vec3d vec3ReachBlock = vec3EyesBlock.add(vec3Look.scale((d0 > 100.0D) ? 100.0D : d0));
 
-			for (int c = (int)Math.ceil(d0 / 100.0D); c > 0; c--) {
-				objectMouseOver = world.rayTraceBlocks(vec3EyesBlock, vec3ReachBlock, true, false, true);
-				vec3EyesBlock = vec3ReachBlock;
+            for (int c = (int) Math.ceil(d0 / 100.0D); c > 0; c--)
+            {
+                objectMouseOver = world.rayTraceBlocks(vec3EyesBlock, vec3ReachBlock, true, false, true);
+                vec3EyesBlock = vec3ReachBlock;
 
-				if (objectMouseOver != null) {
-					if (objectMouseOver.typeOfHit != RayTraceResult.Type.MISS) {
-						break;
-					} else if (objectMouseOver.hitVec != null) {
-						vec3EyesBlock = objectMouseOver.hitVec;
-					}
-				}
+                if (objectMouseOver != null)
+                {
+                    if (objectMouseOver.typeOfHit != RayTraceResult.Type.MISS)
+                    {
+                        break;
+                    }
+                    else if (objectMouseOver.hitVec != null)
+                    {
+                        vec3EyesBlock = objectMouseOver.hitVec;
+                    }
+                }
 
-				d0 -= 100.0D;
-				vec3ReachBlock = vec3ReachBlock.add(vec3Look.scale((d0 > 100.0D) ? 100.0D : d0));
-			}
+                d0 -= 100.0D;
+                vec3ReachBlock = vec3ReachBlock.add(vec3Look.scale((d0 > 100.0D) ? 100.0D : d0));
+            }
 
-			double d1 = distance;
+            double d1 = distance;
 
-			if (objectMouseOver != null) {
-				d1 = objectMouseOver.hitVec.distanceTo(vec3Eyes);
-			}
+            if (objectMouseOver != null)
+            {
+                d1 = objectMouseOver.hitVec.distanceTo(vec3Eyes);
+            }
 
-			float f = 1.0F;
-			Predicate<Entity> predicate = entity -> (entity != null && entity.canBeCollidedWith());
-			List<Entity> list = world.getEntitiesInAABBexcluding(viewEntity,
-					viewEntity.getEntityBoundingBox().addCoord(vec3Look.xCoord * d1, vec3Look.yCoord * d1, vec3Look.zCoord * d1).expand(f, f, f),
-					Predicates.and(EntitySelectors.NOT_SPECTATING, predicate));
-			double d2 = d1;
+            float f = 1.0F;
+            Predicate<Entity> predicate = entity -> (entity != null && entity.canBeCollidedWith());
+            List<Entity> list = world.getEntitiesInAABBexcluding(viewEntity, viewEntity.getEntityBoundingBox().addCoord(vec3Look.xCoord * d1, vec3Look.yCoord * d1, vec3Look.zCoord * d1).expand(f, f, f), Predicates.and(EntitySelectors.NOT_SPECTATING, predicate));
+            double d2 = d1;
 
-			for (Entity entity1 : list) {
-				AxisAlignedBB axisalignedbb = entity1.getEntityBoundingBox().expandXyz(entity1.getCollisionBorderSize());
-				RayTraceResult raytraceresult = axisalignedbb.calculateIntercept(vec3Eyes, vec3Reach);
+            for (Entity entity1 : list)
+            {
+                AxisAlignedBB axisalignedbb = entity1.getEntityBoundingBox().expandXyz(entity1.getCollisionBorderSize());
+                RayTraceResult raytraceresult = axisalignedbb.calculateIntercept(vec3Eyes, vec3Reach);
 
-				if (axisalignedbb.isVecInside(vec3Eyes)) {
-					if (d2 >= 0.0D) {
-						pointedEntity = entity1;
-						vec3EntityPos = raytraceresult == null ? vec3Eyes : raytraceresult.hitVec;
-						d2 = 0.0D;
-					}
-				} else if (raytraceresult != null) {
-					double d3 = vec3Eyes.distanceTo(raytraceresult.hitVec);
+                if (axisalignedbb.isVecInside(vec3Eyes))
+                {
+                    if (d2 >= 0.0D)
+                    {
+                        pointedEntity = entity1;
+                        vec3EntityPos = raytraceresult == null ? vec3Eyes : raytraceresult.hitVec;
+                        d2 = 0.0D;
+                    }
+                }
+                else if (raytraceresult != null)
+                {
+                    double d3 = vec3Eyes.distanceTo(raytraceresult.hitVec);
 
-					if (d3 < d2 || d2 == 0.0D) {
-						if (entity1.getLowestRidingEntity() == viewEntity.getLowestRidingEntity() && !viewEntity.canRiderInteract()) {
-							if (d2 == 0.0D) {
-								pointedEntity = entity1;
-								vec3EntityPos = raytraceresult.hitVec;
-							}
-						} else {
-							pointedEntity = entity1;
-							vec3EntityPos = raytraceresult.hitVec;
-							d2 = d3;
-						}
-					}
-				}
-			}
+                    if (d3 < d2 || d2 == 0.0D)
+                    {
+                        if (entity1.getLowestRidingEntity() == viewEntity.getLowestRidingEntity() && !viewEntity.canRiderInteract())
+                        {
+                            if (d2 == 0.0D)
+                            {
+                                pointedEntity = entity1;
+                                vec3EntityPos = raytraceresult.hitVec;
+                            }
+                        }
+                        else
+                        {
+                            pointedEntity = entity1;
+                            vec3EntityPos = raytraceresult.hitVec;
+                            d2 = d3;
+                        }
+                    }
+                }
+            }
 
-			if (pointedEntity != null && (d2 < d1 || objectMouseOver == null)) {
-				objectMouseOver = new RayTraceResult(pointedEntity, vec3EntityPos);
-			}
-		}
+            if (pointedEntity != null && (d2 < d1 || objectMouseOver == null))
+            {
+                objectMouseOver = new RayTraceResult(pointedEntity, vec3EntityPos);
+            }
+        }
 
-		return objectMouseOver;
-	}
+        return objectMouseOver;
+    }
 
 }

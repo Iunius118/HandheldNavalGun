@@ -30,81 +30,96 @@ import net.minecraftforge.common.model.IModelState;
 import net.minecraftforge.common.model.Models;
 import net.minecraftforge.common.model.TRSRTransformation;
 
-public class ModelPartRenderer {
+public class ModelPartRenderer
+{
 
-	public String name;
-	public List<BakedQuad> quads;
-	public List<ModelPartRenderer> children = Collections.emptyList();
-	public Vec3d offset;
-	public Consumer<Pair<ModelPartRenderer, RenderContext>> renderPart = context -> context.getKey().renderPart(context);
+    public String name;
+    public List<BakedQuad> quads;
+    public List<ModelPartRenderer> children = Collections.emptyList();
+    public Vec3d offset;
+    public Consumer<Pair<ModelPartRenderer, RenderContext>> renderPart = context -> context.getKey().renderPart(context);
 
-	public ModelPartRenderer(@Nullable List<BakedQuad> listQuads, String partName, double offsetX, double offsetY, double offsetZ) {
-		this.quads = (listQuads != null) ? listQuads : Collections.emptyList();
-		this.name = partName;
-		this.offset = new Vec3d(offsetX, offsetY, offsetZ);
-	}
+    public ModelPartRenderer(@Nullable List<BakedQuad> listQuads, String partName, double offsetX, double offsetY, double offsetZ)
+    {
+        this.quads = (listQuads != null) ? listQuads : Collections.emptyList();
+        this.name = partName;
+        this.offset = new Vec3d(offsetX, offsetY, offsetZ);
+    }
 
-	public static void renderPart(Pair<ModelPartRenderer, RenderContext> context) {
-		Tessellator tessellator = Tessellator.getInstance();
-		VertexBuffer vertexbuffer = tessellator.getBuffer();
+    public static void renderPart(Pair<ModelPartRenderer, RenderContext> context)
+    {
+        Tessellator tessellator = Tessellator.getInstance();
+        VertexBuffer vertexbuffer = tessellator.getBuffer();
 
-		vertexbuffer.begin(GL11.GL_QUADS, DefaultVertexFormats.ITEM);
+        vertexbuffer.begin(GL11.GL_QUADS, DefaultVertexFormats.ITEM);
 
-		for (BakedQuad quad : context.getKey().quads) {
-			LightUtil.renderQuadColor(vertexbuffer, quad, -1);
-		}
+        for (BakedQuad quad : context.getKey().quads)
+        {
+            LightUtil.renderQuadColor(vertexbuffer, quad, -1);
+        }
 
-		tessellator.draw();
-	}
+        tessellator.draw();
+    }
 
-	public void doRender(RenderContext context) {
-		GlStateManager.pushMatrix();
+    public void doRender(RenderContext context)
+    {
+        GlStateManager.pushMatrix();
 
-		this.renderPart.accept(Pair.of(this, context));
+        this.renderPart.accept(Pair.of(this, context));
 
-		for (ModelPartRenderer child : children) {
-			child.doRender(context);
-		}
+        for (ModelPartRenderer child : children)
+        {
+            child.doRender(context);
+        }
 
-		GlStateManager.popMatrix();
-	}
+        GlStateManager.popMatrix();
+    }
 
-	public static List<BakedQuad> getPartQuads(OBJModel obj, final List<String> visibleGroups) {
-		List<BakedQuad> quads = Collections.emptyList();
+    public static List<BakedQuad> getPartQuads(OBJModel obj, final List<String> visibleGroups)
+    {
+        List<BakedQuad> quads = Collections.emptyList();
 
-		try {
-			Function<ResourceLocation, TextureAtlasSprite> spriteGetter = resource -> Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(resource.toString());
+        try
+        {
+            Function<ResourceLocation, TextureAtlasSprite> spriteGetter = resource -> Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(resource.toString());
 
-			// ModelState for handling visibility of each group.
-			IModelState modelState = part -> {
-				if (part.isPresent()) {
-					UnmodifiableIterator<String> parts = Models.getParts(part.get());
+            // ModelState for handling visibility of each group.
+            IModelState modelState = part -> {
+                if (part.isPresent())
+                {
+                    UnmodifiableIterator<String> parts = Models.getParts(part.get());
 
-					if (parts.hasNext()) {
-						String name = parts.next();
+                    if (parts.hasNext())
+                    {
+                        String name = parts.next();
 
-						if (!parts.hasNext() && visibleGroups.contains(name)) {
-							// Return Absent for NOT invisible group.
-							return Optional.absent();
-						} else {
-							// Return Present for invisible group.
-							return Optional.of(TRSRTransformation .identity());
-						}
-					}
-				}
+                        if (!parts.hasNext() && visibleGroups.contains(name))
+                        {
+                            // Return Absent for NOT invisible group.
+                            return Optional.absent();
+                        }
+                        else
+                        {
+                            // Return Present for invisible group.
+                            return Optional.of(TRSRTransformation.identity());
+                        }
+                    }
+                }
 
-				return Optional.absent();
-			};
+                return Optional.absent();
+            };
 
-			// Bake model of visible groups.
-			IBakedModel bakedModel = obj.bake(modelState, DefaultVertexFormats.ITEM, spriteGetter);
+            // Bake model of visible groups.
+            IBakedModel bakedModel = obj.bake(modelState, DefaultVertexFormats.ITEM, spriteGetter);
 
-			quads = bakedModel.getQuads(null, null, 0);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+            quads = bakedModel.getQuads(null, null, 0);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
 
-		return quads;
-	}
+        return quads;
+    }
 
 }
