@@ -1,24 +1,16 @@
 package iunius118.mods.handheldnavalgun.client.util;
 
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 import java.util.List;
 
 import javax.annotation.Nullable;
-
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.util.glu.GLU;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EntitySelectors;
 import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -28,156 +20,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class ClientUtils
 {
-    public static final ClientUtils INSTANCE = new ClientUtils();
-
-    private int tempDisplayWidth = 1;
-    private int tempDisplayHeight = 1;
-    private int tempGuiScale = 1;
-    private int scaleFactor = 1;
-
-    private static double[] v0rate;
-
-    public ClientUtils()
-    {
-        this.v0rate = new double[128];
-
-        for (int i = 0; i < this.v0rate.length; i++)
-        {
-            this.v0rate[i] = 100 * (1 - Math.exp(-0.01 * i));
-        }
-    }
-
-    public static double ticksToV0Rate(int t)
-    {
-        if (v0rate == null)
-        {
-            return INSTANCE.ticksToV0Rate(t);
-        }
-
-        double d;
-
-        if (t >= 0 && t < v0rate.length)
-        {
-            d = v0rate[t];
-        }
-        else
-        {
-            d = 100 * (1 - Math.exp(-0.01 * t));
-        }
-
-        return d;
-    }
-
-    @Nullable
-    public static Vec3d getScreenPos(@Nullable Vec3d pos, float partialTicks)
-    {
-        Entity viewEntity = Minecraft.getMinecraft().getRenderViewEntity();
-
-        if (pos != null && viewEntity != null)
-        {
-
-            double x = pos.xCoord - (viewEntity.lastTickPosX + (viewEntity.posX - viewEntity.lastTickPosX) * partialTicks);
-            double y = pos.yCoord - (viewEntity.lastTickPosY + (viewEntity.posY - viewEntity.lastTickPosY) * partialTicks) - viewEntity.getEyeHeight();
-            double z = pos.zCoord - (viewEntity.lastTickPosZ + (viewEntity.posZ - viewEntity.lastTickPosZ) * partialTicks);
-
-            Vec3d look = viewEntity.getLook(partialTicks);
-
-            if (Minecraft.getMinecraft().getRenderManager().options != null && Minecraft.getMinecraft().getRenderManager().options.thirdPersonView == 2)
-            {
-                look = look.scale(-1);
-            }
-
-            if (x != 0.0D || y != 0.0D || z != 0.0D)
-            {
-                double d = (x * look.xCoord + y * look.yCoord + z * look.zCoord) / (Math.sqrt(x * x + y * y + z * z) * look.lengthVector());
-                if (d < 0.0D)
-                {
-                    return null;
-                }
-                else
-                {
-                    return ClientUtils.getScreenCoordsFrom3dCoords((float) x, (float) y + viewEntity.getEyeHeight(), (float) z);
-                }
-            }
-        }
-
-        return null;
-    }
-
-    @Nullable
-    public static Vec3d getScreenPos(float yaw, float pitch, float partialTicks)
-    {
-        float f = MathHelper.cos(-yaw * 0.017453292F - (float) Math.PI);
-        float f1 = MathHelper.sin(-yaw * 0.017453292F - (float) Math.PI);
-        float f2 = -MathHelper.cos(-pitch * 0.017453292F);
-        float f3 = MathHelper.sin(-pitch * 0.017453292F);
-        Vec3d pos = new Vec3d(f1 * f2, f3, f * f2).scale(5.0D);
-        Entity viewEntity = Minecraft.getMinecraft().getRenderViewEntity();
-
-        if (viewEntity != null)
-        {
-            double x = pos.xCoord;
-            double y = pos.yCoord;
-            double z = pos.zCoord;
-            double lenSq = x * x + y * y + z * z;
-
-            if (lenSq < 1e-8)
-            {
-                return null;
-            }
-
-            Vec3d look = viewEntity.getLook(partialTicks);
-
-            if (Minecraft.getMinecraft().getRenderManager().options != null && Minecraft.getMinecraft().getRenderManager().options.thirdPersonView == 2)
-            {
-                look = look.scale(-1);
-            }
-
-            double deg = Math.toDegrees(Math.acos((x * look.xCoord + y * look.yCoord + z * look.zCoord) / (Math.sqrt(lenSq) * look.lengthVector())));
-
-            if (deg < 90)
-            {
-                return ClientUtils.getScreenCoordsFrom3dCoords((float) x, (float) y + viewEntity.getEyeHeight(), (float) z);
-            }
-        }
-
-        return null;
-    }
-
-    @Nullable
-    public static Vec3d getScreenCoordsFrom3dCoords(float x, float y, float z)
-    {
-        IntBuffer viewport = BufferUtils.createIntBuffer(16);
-        FloatBuffer modelview = BufferUtils.createFloatBuffer(16);
-        FloatBuffer projection = BufferUtils.createFloatBuffer(16);
-        FloatBuffer screenCoords = BufferUtils.createFloatBuffer(4);
-
-        GL11.glGetFloat(GL11.GL_MODELVIEW_MATRIX, modelview);
-        GL11.glGetFloat(GL11.GL_PROJECTION_MATRIX, projection);
-        GL11.glGetInteger(GL11.GL_VIEWPORT, viewport);
-
-        boolean result = GLU.gluProject(x, y, z, modelview, projection, viewport, screenCoords);
-
-        if (result)
-        {
-            Minecraft mc = Minecraft.getMinecraft();
-            ClientUtils cu = ClientUtils.INSTANCE;
-
-            if (cu.tempDisplayWidth != mc.displayWidth || cu.tempDisplayHeight != mc.displayHeight || cu.tempGuiScale != mc.gameSettings.guiScale)
-            {
-                cu.scaleFactor = new ScaledResolution(mc).getScaleFactor();
-                cu.tempDisplayWidth = mc.displayWidth;
-                cu.tempDisplayHeight = mc.displayHeight;
-                cu.tempGuiScale = mc.gameSettings.guiScale;
-            }
-
-            return new Vec3d(screenCoords.get(0) / cu.scaleFactor, (mc.displayHeight - screenCoords.get(1)) / cu.scaleFactor, 0);
-        }
-        else
-        {
-            return null;
-        }
-    }
 
     @Nullable
     public static RayTraceResult getMouseOver(double distance, float partialTicks)

@@ -7,8 +7,8 @@ import com.google.common.collect.Multimap;
 import iunius118.mods.handheldnavalgun.HandheldNavalGun;
 import iunius118.mods.handheldnavalgun.HandheldNavalGun.PacketHandler;
 import iunius118.mods.handheldnavalgun.capability.CapabilityReloadTime;
-import iunius118.mods.handheldnavalgun.client.gunfirecontrolsystem.ComputerGun127mmType89;
-import iunius118.mods.handheldnavalgun.client.gunfirecontrolsystem.DirectorGun127mmType89;
+import iunius118.mods.handheldnavalgun.client.gunfirecontrolsystem.IGunComputer;
+import iunius118.mods.handheldnavalgun.client.gunfirecontrolsystem.IGunDirector;
 import iunius118.mods.handheldnavalgun.client.gunfirecontrolsystem.Target;
 import iunius118.mods.handheldnavalgun.client.util.ClientUtils;
 import iunius118.mods.handheldnavalgun.entity.EntityProjectile127mmAntiAircraftCommon;
@@ -89,7 +89,7 @@ public class ItemGun127mmType89Single extends Item
         {
             // Targeting process on Client
             RayTraceResult result = ClientUtils.getMouseOver(256.0D, 1.0F);
-            DirectorGun127mmType89 director = HandheldNavalGun.INSTANCE.gunFireControlSystem.director;
+            IGunDirector director = HandheldNavalGun.INSTANCE.gunFireControlSystem.director;
 
             if (Minecraft.getMinecraft().thePlayer.isSneaking())
             {
@@ -217,12 +217,12 @@ public class ItemGun127mmType89Single extends Item
             else
             {
                 // Client: Shoot
-                ComputerGun127mmType89 rangeKeeper = HandheldNavalGun.INSTANCE.rangeKeeper;
+                IGunComputer computer = HandheldNavalGun.INSTANCE.gunFireControlSystem.computer;
 
-                if (rangeKeeper.isValid() && nbt.hasUniqueId(this.TAG_UNIQUE_ID))
+                if (computer.isValid() && nbt.hasUniqueId(this.TAG_UNIQUE_ID))
                 {
                     // Client: Send fuse tick to Server
-                    PacketHandler.INSTANCE.sendToServer(new MessageGunShot(nbt.getUniqueId(this.TAG_UNIQUE_ID), rangeKeeper.getFuse()));
+                    PacketHandler.INSTANCE.sendToServer(new MessageGunShot(nbt.getUniqueId(this.TAG_UNIQUE_ID), computer.getFuse()));
                 }
             }
 

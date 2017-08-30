@@ -100,7 +100,7 @@ public class Target
 
             if (entity != null && !entity.isDead)
             {
-                return new Vec3d(entity.posX, entity.posY, entity.posZ);
+                return new Vec3d(entity.posX, entity.posY + entity.height / 2.0D, entity.posZ);
             }
         }
 
@@ -154,6 +154,7 @@ public class Target
                 double x = entity.posX - entity.lastTickPosX;
                 double y = entity.posY - entity.lastTickPosY;
                 double z = entity.posZ - entity.lastTickPosZ;
+                // System.out.println(entity.getName() + " " + new Vec3d(x, y, z));
                 return new Vec3d(x, y, z);
             }
         }

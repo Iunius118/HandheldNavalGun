@@ -39,16 +39,18 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 
-@Mod(modid = HandheldNavalGun.MOD_ID, name = HandheldNavalGun.MOD_NAME, version = HandheldNavalGun.MOD_VERSION,
-        dependencies = HandheldNavalGun.MOD_DEPENDENCIES,
-        acceptedMinecraftVersions = HandheldNavalGun.MOD_ACCEPTED_MC_VERSIONS, useMetadata = true)
+@Mod    (modid = HandheldNavalGun.MOD_ID, name = HandheldNavalGun.MOD_NAME,
+        version = HandheldNavalGun.MOD_VERSION,
+        // dependencies = HandheldNavalGun.MOD_DEPENDENCIES,
+        acceptedMinecraftVersions = HandheldNavalGun.MOD_ACCEPTED_MC_VERSIONS,
+        useMetadata = true)
 public class HandheldNavalGun
 {
 
     public static final String MOD_ID = "handheldnavalgun";
     public static final String MOD_NAME = "HandheldNavalGun";
     public static final String MOD_VERSION = "%MOD_VERSION%";
-    public static final String MOD_DEPENDENCIES = "required-after:forge@[12.18.2.2099,)";
+    // public static final String MOD_DEPENDENCIES = "required-after:forge@[1.10.2-12.18.3.2185,)";
     public static final String MOD_ACCEPTED_MC_VERSIONS = "[1.10.2,]";
 
     @Mod.Instance(MOD_ID)

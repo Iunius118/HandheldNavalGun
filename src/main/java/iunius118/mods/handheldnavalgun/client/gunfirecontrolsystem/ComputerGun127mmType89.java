@@ -2,7 +2,6 @@ package iunius118.mods.handheldnavalgun.client.gunfirecontrolsystem;
 
 import javax.annotation.Nullable;
 
-import iunius118.mods.handheldnavalgun.client.util.ClientUtils;
 import iunius118.mods.handheldnavalgun.entity.EntityProjectile127mmAntiAircraftCommon;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -15,104 +14,84 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class ComputerGun127mmType89 implements IGunComputer
 {
 
-    public Target target;
-    public int ticksFuse = EntityProjectile127mmAntiAircraftCommon.FUSE_MAX;
+    private boolean isValid = false;
+    private IGunDirector director;
+    private double futureYaw;
+    private double futurePitch;
+    private int ticksFuse = EntityProjectile127mmAntiAircraftCommon.FUSE_MAX;
 
-    public double futureYaw;
-    public double futurePitch;
-    public double prevFutureYaw;
-    public double prevFuturePitch;
-
-    private boolean isValid;
-
+    @Override
     public boolean isValid()
     {
         return this.isValid;
     }
 
-    public void setTarget(@Nullable Target targetIn)
+    @Override
+    public void setDirector(@Nullable IGunDirector director)
     {
-        this.target = targetIn;
+        this.director = director;
     }
 
+    @Override
     @Nullable
-    public Target getTarget()
+    public IGunDirector getDirector()
     {
-        return this.target;
+        return this.director;
     }
 
-    public void setFuse(int ticks)
+    @Override
+    public double getTargetFutureYaw()
     {
-        if (ticks < 0)
-        {
-            this.ticksFuse = 0;
-        }
-        else if (ticks > EntityProjectile127mmAntiAircraftCommon.FUSE_MAX)
-        {
-            this.setFuseMax();
-        }
-        else
-        {
-            this.ticksFuse = ticks;
-        }
+        return futureYaw;
     }
 
-    public void setFuseMax()
+    @Override
+    public double getTargetFuturePitch()
     {
-        this.ticksFuse = EntityProjectile127mmAntiAircraftCommon.FUSE_MAX;
+        return futurePitch;
     }
 
+    @Override
     public int getFuse()
     {
         return this.ticksFuse;
     }
 
-    @Nullable
-    public Vec3d getTargetScreenPos(World world, float partialTicks)
+    @Override
+    public void update(@Nullable World world)
     {
-        return ClientUtils.getScreenPos(target.getPos(world, partialTicks), partialTicks);
-    }
+        /*
+         * Compute future target direction from the player and the fuse time for EntityThrowable (gravity velocity: 0.03, attenuation rate: 0.99) of which initial velocity is 4 m/ticks.
+         */
 
-    @Nullable
-    public Vec3d getTargetFutureScreenPos(World world, float partialTicks)
-    {
-        if (this.isValid)
+        if (director == null && !director.isValid(world))
         {
-            double yaw = futureYaw;
-            double pitch = futurePitch;
-
-            return ClientUtils.getScreenPos((float) yaw, (float) pitch, partialTicks);
+            this.isValid = false;
+            return;
         }
 
-        return null;
-    }
+        Vec3d vec3TargetDelta = director.getTargetMotion(world);
 
-    /*
-     * Compute future target direction from the player and fuse time for EntityThrowable (gravity velocity: 0.03, attenuation rate: 0.99) initial velocity of 4 m/ticks
-     */
-    public boolean updatetFutureTarget(World world)
-    {
-        this.prevFutureYaw = this.futureYaw;
-        this.prevFuturePitch = this.futurePitch;
-
-        if (this.target == null)
+        if (vec3TargetDelta == null)
         {
-            return setIsValid(false);
+            this.isValid = false;
+            return;
         }
 
-        Vec3d vec3TargetDelta = this.target.getPosDelta(world);
-        Vec3d vec3Target1 = this.target.getPos(world).add(vec3TargetDelta);
+        Vec3d vec3Target1 = director.getTargetPos(world).add(vec3TargetDelta);
 
-        if (vec3TargetDelta == null || vec3Target1 == null)
+        if (vec3Target1 == null)
         {
-            return setIsValid(false);
+            this.isValid = false;
+            return;
         }
 
         Entity player = Minecraft.getMinecraft().thePlayer;
 
         if (player == null)
         {
-            return setIsValid(false);
+            this.isValid = false;
+            return;
         }
 
         Vec3d vec3Player = new Vec3d(player.posX, player.posY + player.getEyeHeight(), player.posZ);
@@ -121,17 +100,24 @@ public class ComputerGun127mmType89 implements IGunComputer
         int t; // Fuse tick to set
 
         // Skip tick by distance
-        for (t = 1; t <= EntityProjectile127mmAntiAircraftCommon.FUSE_MAX; t++)
-        {
+        if(this.director.getTarget().type != Target.Type.ENTITY) {
             double r = vec3Player.distanceTo(vec3Target1);
-            int ts = (int) Math.floor(0.00007D * r * r + 0.25D * r - 0.04D);
-
-            if (ts <= t)
+            t = (int) Math.floor(0.00007D * r * r + 0.25D * r - 0.04D);
+        }
+        else
+        {
+            for (t = 1; t <= EntityProjectile127mmAntiAircraftCommon.FUSE_MAX; t++)
             {
-                break;
-            }
+                double r = vec3Player.distanceTo(vec3Target1);
+                int ts = (int) Math.floor(0.00007D * r * r + 0.25D * r - 0.04D);
 
-            vec3Target1 = vec3Target1.add(vec3TargetDelta);
+                if (ts <= t)
+                {
+                    break;
+                }
+
+                vec3Target1 = vec3Target1.add(vec3TargetDelta);
+            }
         }
 
         // Calculate initial velocity from tick, height and distance
@@ -139,8 +125,8 @@ public class ComputerGun127mmType89 implements IGunComputer
         double z1 = vec3Target1.zCoord - vec3Player.zCoord;
         double tx1 = Math.sqrt(x1 * x1 + z1 * z1);
         double ty1 = vec3Target1.yCoord - vec3Player.yCoord;
-        double v0x1 = tx1 / ClientUtils.ticksToV0Rate(t);
-        double v0y1 = (ty1 + 3.0D * t) / ClientUtils.ticksToV0Rate(t) - 3.0D;
+        double v0x1 = tx1 / ticksToV0Rate(t);
+        double v0y1 = (ty1 + 3.0D * t) / ticksToV0Rate(t) - 3.0D;
         double v0sq1 = v0x1 * v0x1 + v0y1 * v0y1;
 
         for (; t <= EntityProjectile127mmAntiAircraftCommon.FUSE_MAX; t++)
@@ -151,11 +137,11 @@ public class ComputerGun127mmType89 implements IGunComputer
             double z2 = vec3Target2.zCoord - vec3Player.zCoord;
             double tx2 = Math.sqrt(x2 * x2 + z2 * z2);
             double ty2 = vec3Target2.yCoord - vec3Player.yCoord;
-            double v0x2 = tx2 / ClientUtils.ticksToV0Rate(t + 1);
-            double v0y2 = (ty2 + 3.0D * (t + 1)) / ClientUtils.ticksToV0Rate(t + 1) - 3.0D;
+            double v0x2 = tx2 / ticksToV0Rate(t + 1);
+            double v0y2 = (ty2 + 3.0D * (t + 1)) / ticksToV0Rate(t + 1) - 3.0D;
             double v0sq2 = v0x2 * v0x2 + v0y2 * v0y2;
 
-            // If calculated initial velocity is closest to the real velocity (4 m/ticks), update the tick and the future target direction from the player, and return
+            // If the initial velocity which calculated is closest to the real one (4 m/ticks), update the future target direction from the player and the fuse tick, and return
             if ((v0sq1 > v0sq2 && v0sq1 >= v0sq && v0sq2 < v0sq) || (v0sq1 < v0sq2 && v0sq1 < v0sq && v0sq2 >= v0sq))
             {
                 if (Math.abs(v0sq1 - v0sq) <= Math.abs(v0sq2 - v0sq))
@@ -175,7 +161,8 @@ public class ComputerGun127mmType89 implements IGunComputer
                 }
 
                 this.ticksFuse = t;
-                return setIsValid(t > EntityProjectile127mmAntiAircraftCommon.FUSE_SAFETY);
+                this.isValid = (t > EntityProjectile127mmAntiAircraftCommon.FUSE_SAFETY);
+                return;
             }
 
             // Tick progress
@@ -188,13 +175,31 @@ public class ComputerGun127mmType89 implements IGunComputer
         }
 
         // Out of range
-        return setIsValid(false);
+        this.isValid = false;
+        return;
     }
 
-    public boolean setIsValid(boolean is_valid)
+    private static double[] v0rate;
+    static
     {
-        this.isValid = is_valid;
-        return is_valid;
+        v0rate = new double[128];
+
+        for (int i = 0; i < v0rate.length; i++)
+        {
+            v0rate[i] = 100 * (1 - Math.exp(-0.01 * i));
+        }
+    }
+
+    private double ticksToV0Rate(int t)
+    {
+        if (t >= 0 && t < v0rate.length)
+        {
+            return v0rate[t];
+        }
+        else
+        {
+            return 100 * (1 - Math.exp(-0.01 * t));
+        }
     }
 
 }

@@ -8,8 +8,14 @@ public class GunFireControlSystemGun127mmType89
     public IGunComputer computer = new ComputerGun127mmType89();
     public IGunIndicator indicator = new IndicatorGun127mmType89();
 
-    public void update(World world)
+    public void updateDirectorAndComputer(World world)
     {
         director.update(world, computer);
+    }
+
+    public void updateIndicator(World world, float partialTicks)
+    {
+        indicator.setComputer(computer);
+        indicator.update(world, partialTicks);
     }
 }
