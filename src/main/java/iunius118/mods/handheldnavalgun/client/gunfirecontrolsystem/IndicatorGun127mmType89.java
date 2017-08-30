@@ -161,14 +161,14 @@ public class IndicatorGun127mmType89 implements IGunIndicator
         return null;
     }
 
+    private static final IntBuffer viewport = BufferUtils.createIntBuffer(16);
+    private static final FloatBuffer modelview = BufferUtils.createFloatBuffer(16);
+    private static final FloatBuffer projection = BufferUtils.createFloatBuffer(16);
+    private static final FloatBuffer screenCoords = BufferUtils.createFloatBuffer(4);
+
     @Nullable
     private Vec3d getScreenCoordsFrom3dCoords(float x, float y, float z)
     {
-        IntBuffer viewport = BufferUtils.createIntBuffer(16);
-        FloatBuffer modelview = BufferUtils.createFloatBuffer(16);
-        FloatBuffer projection = BufferUtils.createFloatBuffer(16);
-        FloatBuffer screenCoords = BufferUtils.createFloatBuffer(4);
-
         GL11.glGetFloat(GL11.GL_MODELVIEW_MATRIX, modelview);
         GL11.glGetFloat(GL11.GL_PROJECTION_MATRIX, projection);
         GL11.glGetInteger(GL11.GL_VIEWPORT, viewport);
