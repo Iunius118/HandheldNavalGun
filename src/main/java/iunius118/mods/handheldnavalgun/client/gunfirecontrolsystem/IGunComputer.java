@@ -2,6 +2,7 @@ package iunius118.mods.handheldnavalgun.client.gunfirecontrolsystem;
 
 import javax.annotation.Nullable;
 
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 public interface IGunComputer
@@ -30,18 +31,11 @@ public interface IGunComputer
     public IGunDirector getDirector();
 
     /**
-     * Get the target's future yaw which computed by this computer.
+     * Get the Line of Fire to the target which computed by this computer.
      *
-     * @return The target's future yaw in degrees.
+     * @return A vector containing the double coordinates of the Line of Fire to the target.
      */
-    public double getTargetFutureYaw();
-
-    /**
-     * Get the target's future pitch which computed by this computer.
-     *
-     * @return The target's future pitch in degrees.
-     */
-    public double getTargetFuturePitch();
+    public Vec3d getTargetFutureLineOfFire();
 
     /**
      * Get the fuse ticks which computed by this computer.

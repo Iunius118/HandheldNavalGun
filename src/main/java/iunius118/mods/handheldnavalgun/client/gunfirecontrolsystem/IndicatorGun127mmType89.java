@@ -76,10 +76,7 @@ public class IndicatorGun127mmType89 implements IGunIndicator
 
         if(this.isValid())
         {
-            double yaw = computer.getTargetFutureYaw();
-            double pitch = computer.getTargetFuturePitch();
-
-            this.targetFutureScreenPos = getScreenPos((float) yaw, (float) pitch, partialTicks);
+            this.targetFutureScreenPos = getScreenPos(computer.getTargetFutureLineOfFire(), partialTicks);
         }
 
         return;
@@ -96,7 +93,7 @@ public class IndicatorGun127mmType89 implements IGunIndicator
             double x = pos.xCoord - (viewEntity.lastTickPosX + (viewEntity.posX - viewEntity.lastTickPosX) * partialTicks);
             double y = pos.yCoord - (viewEntity.lastTickPosY + (viewEntity.posY - viewEntity.lastTickPosY) * partialTicks) - viewEntity.getEyeHeight();
             double z = pos.zCoord - (viewEntity.lastTickPosZ + (viewEntity.posZ - viewEntity.lastTickPosZ) * partialTicks);
-
+            double lenSq = x * x + y * y + z * z;
             Vec3d look = viewEntity.getLook(partialTicks);
 
             if (Minecraft.getMinecraft().getRenderManager().options != null && Minecraft.getMinecraft().getRenderManager().options.thirdPersonView == 2)
@@ -104,10 +101,10 @@ public class IndicatorGun127mmType89 implements IGunIndicator
                 look = look.scale(-1);
             }
 
-            if (x != 0.0D || y != 0.0D || z != 0.0D)
+            if (lenSq >= 1e-8)
             {
-                double d = (x * look.xCoord + y * look.yCoord + z * look.zCoord) / (Math.sqrt(x * x + y * y + z * z) * look.lengthVector());
-                if (d < 0.0D)
+                double d = (x * look.xCoord + y * look.yCoord + z * look.zCoord) / (Math.sqrt(lenSq) * look.lengthVector());
+                if (d < 1e-8)
                 {
                     return null;
                 }

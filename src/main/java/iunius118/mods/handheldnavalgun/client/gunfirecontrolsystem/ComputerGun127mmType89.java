@@ -16,8 +16,9 @@ public class ComputerGun127mmType89 implements IGunComputer
 
     private boolean isValid = false;
     private IGunDirector director;
-    private double futureYaw;
-    private double futurePitch;
+    // private double futureYaw;
+    // private double futurePitch;
+    private Vec3d futureLoF;
     private int ticksFuse = EntityProjectile127mmAntiAircraftCommon.FUSE_MAX;
 
     @Override
@@ -40,15 +41,9 @@ public class ComputerGun127mmType89 implements IGunComputer
     }
 
     @Override
-    public double getTargetFutureYaw()
+    public Vec3d getTargetFutureLineOfFire()
     {
-        return futureYaw;
-    }
-
-    @Override
-    public double getTargetFuturePitch()
-    {
-        return futurePitch;
+        return this.futureLoF;
     }
 
     @Override
@@ -146,8 +141,10 @@ public class ComputerGun127mmType89 implements IGunComputer
             {
                 if (Math.abs(v0sq1 - v0sq) <= Math.abs(v0sq2 - v0sq))
                 {
-                    this.futureYaw = (tx1 != 0.0D) ? Math.toDegrees(Math.atan2(-vec3Target1.xCoord + vec3Player.xCoord, vec3Target1.zCoord - vec3Player.zCoord)) : 0.0D;
-                    this.futurePitch = -Math.toDegrees(Math.atan2(v0y1, v0x1));
+                    this.futureLoF = new Vec3d(vec3Target1.xCoord, vec3Player.yCoord + (v0y1 / v0x1 * tx1), vec3Target1.zCoord);
+
+                    // double futureYaw = (tx1 != 0.0D) ? Math.toDegrees(Math.atan2(-vec3Target1.xCoord + vec3Player.xCoord, vec3Target1.zCoord - vec3Player.zCoord)) : 0.0D;
+                    // double futurePitch = -Math.toDegrees(Math.atan2(v0y1, v0x1));
                 }
                 else
                 {
@@ -156,8 +153,10 @@ public class ComputerGun127mmType89 implements IGunComputer
                         t++;
                     }
 
-                    this.futureYaw = (tx2 != 0.0D) ? Math.toDegrees(Math.atan2(-vec3Target2.xCoord + vec3Player.xCoord, vec3Target2.zCoord - vec3Player.zCoord)) : 0.0D;
-                    this.futurePitch = -Math.toDegrees(Math.atan2(v0y2, v0x2));
+                    this.futureLoF = new Vec3d(vec3Target2.xCoord, vec3Player.yCoord + (v0y2 / v0x2 * tx2), vec3Target2.zCoord);
+
+                    // double futureYaw = (tx2 != 0.0D) ? Math.toDegrees(Math.atan2(-vec3Target2.xCoord + vec3Player.xCoord, vec3Target2.zCoord - vec3Player.zCoord)) : 0.0D;
+                    // double futurePitch = -Math.toDegrees(Math.atan2(v0y2, v0x2));
                 }
 
                 this.ticksFuse = t;

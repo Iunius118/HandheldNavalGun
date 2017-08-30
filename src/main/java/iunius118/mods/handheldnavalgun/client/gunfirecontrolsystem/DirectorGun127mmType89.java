@@ -18,13 +18,14 @@ public class DirectorGun127mmType89 implements IGunDirector
     @Override
     public boolean isValid(@Nullable World world)
     {
-        return target != null && target.isValid(world);
+        return this.target != null && target.isValid(world);
     }
 
     @Override
     public void setTarget(@Nullable Target targetIn)
     {
         this.target = targetIn;
+        this.deltas = new Vec3d[MAX_DELTA_COUNT];
     }
 
     @Override
