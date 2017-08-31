@@ -16,8 +16,6 @@ public class ComputerGun127mmType89 implements IGunComputer
 
     private boolean isValid = false;
     private IGunDirector director;
-    // private double futureYaw;
-    // private double futurePitch;
     private Vec3d futureLoF;
     private int ticksFuse = EntityProjectile127mmAntiAircraftCommon.FUSE_MAX;
 
