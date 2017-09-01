@@ -11,9 +11,11 @@ import iunius118.mods.handheldnavalgun.client.ClientEventHandler;
 import iunius118.mods.handheldnavalgun.client.HandheldNavalGunClientRegistry;
 import iunius118.mods.handheldnavalgun.client.gunfirecontrolsystem.GunFireControlSystemGun127mmType89;
 import iunius118.mods.handheldnavalgun.client.model.ModelItemGun127mmType89Single;
+import iunius118.mods.handheldnavalgun.entity.EntityProjectile127mmAntiAircraftCommon;
 import iunius118.mods.handheldnavalgun.item.ItemGun127mmType89Single;
 import iunius118.mods.handheldnavalgun.item.ItemRound127mmAntiAircraftCommon;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import iunius118.mods.handheldnavalgun.packet.MessageGunShot;
+import iunius118.mods.handheldnavalgun.packet.MessageGunShotHandler;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -25,6 +27,7 @@ import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
+import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -33,6 +36,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -73,11 +77,11 @@ public class HandheldNavalGun
     @EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
-        HandheldNavalGunRegistry.registerMessage();
-        HandheldNavalGunRegistry.registerCapabilities();
-        registerItems();
-        registerRecipes();
-        HandheldNavalGunRegistry.resisterEntities();
+        this.registerMessage();
+        this.registerCapabilities();
+        this.registerItems();
+        this.registerRecipes();
+        this.resisterEntities();
         MinecraftForge.EVENT_BUS.register(this);
 
         if (event.getSide().isClient())
@@ -103,10 +107,19 @@ public class HandheldNavalGun
         }
     }
 
+    /* Packets */
+
     public static class PacketHandler
     {
         public static final SimpleNetworkWrapper INSTANCE = NetworkRegistry.INSTANCE.newSimpleChannel(HandheldNavalGun.MOD_ID);
     }
+
+    public void registerMessage()
+    {
+        PacketHandler.INSTANCE.registerMessage(MessageGunShotHandler.class, MessageGunShot.class, 0, Side.SERVER);
+    }
+
+    /* Capabilities */
 
     public static class Capabilities
     {
@@ -121,6 +134,27 @@ public class HandheldNavalGun
             return RELOAD_TIMEI_CAPABILITY;
         }
     }
+
+    public void registerCapabilities()
+    {
+        CapabilityManager.INSTANCE.register(
+                CapabilityReloadTime.IReloadTimeICapability.class,
+                new CapabilityReloadTime.Storage(),
+                CapabilityReloadTime.DefaultImpl.class);
+    }
+
+    @SubscribeEvent
+    public void onItemStackLoad(AttachCapabilitiesEvent.Item event)
+    {
+        if (event.getItem() instanceof ItemGun127mmType89Single)
+        {
+            event.addCapability(
+                    new ResourceLocation(HandheldNavalGun.MOD_ID, Capabilities.NAME_RELOAD_TIMEI_CAPABILITY),
+                    new CapabilityReloadTime.Provider());
+        }
+    }
+
+    /* Items */
 
     public static class ITEMS
     {
@@ -139,13 +173,15 @@ public class HandheldNavalGun
                 .setCreativeTab(CreativeTabs.COMBAT);
     }
 
-    public static void registerItems()
+    public void registerItems()
     {
         GameRegistry.register(ITEMS.GUN_127MM_TYPE89_SINGLE);
         GameRegistry.register(ITEMS.ROUND_127MM_AAC);
     }
 
-    public static void registerRecipes()
+    /* Recipes */
+
+    public void registerRecipes()
     {
         GameRegistry.addRecipe(new ShapedOreRecipe(
                 new ItemStack(HandheldNavalGun.ITEMS.GUN_127MM_TYPE89_SINGLE),
@@ -177,32 +213,20 @@ public class HandheldNavalGun
                 'T', Blocks.TNT));
     }
 
-    @SideOnly(Side.CLIENT)
-    public static class ModelLocations
-    {
-        public static final ModelResourceLocation MRL_ITEM_GUN_127MM_TYPE89_SINGLE = new ModelResourceLocation(HandheldNavalGun.MOD_ID + ":gun_127mm_type89_1", "inventory");
-        public static final ResourceLocation RL_OBJ_ITEM_GUN_127MM_TYPE89_SINGLE = new ResourceLocation(HandheldNavalGun.MOD_ID + ":item/gun_127mm_type89_1.obj");
+    /* Entities */
 
-        public static final ModelResourceLocation MRL_ITEM_ROUND_127MM_AAC = new ModelResourceLocation(HandheldNavalGun.MOD_ID + ":round_127mm_aac", "inventory");
+    public enum EntityID
+    {
+        PROJECTILE_127MM_ANTI_AIRCRAFT_COMMON,
     }
 
-    @SideOnly(Side.CLIENT)
-    public static class TextureLocations
+    public void resisterEntities()
     {
-        public static final ResourceLocation TEX_MOB_CREW = new ResourceLocation(HandheldNavalGun.MOD_ID, "entity/mob_crew");
-        public static final ResourceLocation TEX_MOB_CREW_MAIN_HAND = new ResourceLocation(HandheldNavalGun.MOD_ID, "entity/mob_crew_mh");
-        public static final ResourceLocation TEX_MOB_CREW_OFF_HAND = new ResourceLocation(HandheldNavalGun.MOD_ID, "entity/mob_crew_oh");
-    }
-
-    @SubscribeEvent
-    public void onItemStackLoad(AttachCapabilitiesEvent.Item event)
-    {
-        if (event.getItem() instanceof ItemGun127mmType89Single)
-        {
-            event.addCapability(
-                    new ResourceLocation(HandheldNavalGun.MOD_ID, Capabilities.NAME_RELOAD_TIMEI_CAPABILITY),
-                    new CapabilityReloadTime.Provider());
-        }
+        EntityRegistry.registerModEntity(
+                EntityProjectile127mmAntiAircraftCommon.class,
+                "entity_projectile_127mm_anti_aircraft_common",
+                EntityID.PROJECTILE_127MM_ANTI_AIRCRAFT_COMMON.ordinal(),
+                HandheldNavalGun.INSTANCE, 256, 5, true);
     }
 
 }

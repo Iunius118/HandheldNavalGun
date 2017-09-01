@@ -2,6 +2,7 @@ package iunius118.mods.handheldnavalgun.client.renderer;
 
 import iunius118.mods.handheldnavalgun.HandheldNavalGun;
 import iunius118.mods.handheldnavalgun.capability.CapabilityReloadTime;
+import iunius118.mods.handheldnavalgun.client.HandheldNavalGunClientRegistry;
 import iunius118.mods.handheldnavalgun.client.model.ModelBakedItemOBJ;
 import iunius118.mods.handheldnavalgun.item.ItemGun127mmType89Single;
 import iunius118.mods.handheldnavalgun.tileentity.TileEntityItemGun127mmType89Single;
@@ -27,8 +28,7 @@ public class RenderItemGun127mmType89Single extends TileEntitySpecialRenderer<Ti
             return;
 
         Minecraft mc = Minecraft.getMinecraft();
-        ModelBakedItemOBJ model = (ModelBakedItemOBJ) mc.getRenderItem().getItemModelMesher().getModelManager()
-                .getModel(HandheldNavalGun.ModelLocations.MRL_ITEM_GUN_127MM_TYPE89_SINGLE);
+        ModelBakedItemOBJ model = (ModelBakedItemOBJ) mc.getRenderItem().getItemModelMesher().getModelManager().getModel(HandheldNavalGunClientRegistry.ModelLocations.MRL_ITEM_GUN_127MM_TYPE89_SINGLE);
         RenderContext context = new RenderContext(model.item, model.player, model.transformTypeCamera);
 
         GlStateManager.popMatrix();

@@ -11,6 +11,7 @@ import iunius118.mods.handheldnavalgun.entity.EntityProjectile127mmAntiAircraftC
 import iunius118.mods.handheldnavalgun.tileentity.TileEntityItemGun127mmType89Single;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.IBakedModel;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
@@ -29,73 +30,73 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class HandheldNavalGunClientRegistry
 {
+    /* Models */
+
+    @SideOnly(Side.CLIENT)
+    public static class ModelLocations
+    {
+        public static final ModelResourceLocation MRL_ITEM_GUN_127MM_TYPE89_SINGLE = new ModelResourceLocation(HandheldNavalGun.MOD_ID + ":gun_127mm_type89_1", "inventory");
+        public static final ResourceLocation RL_OBJ_ITEM_GUN_127MM_TYPE89_SINGLE = new ResourceLocation(HandheldNavalGun.MOD_ID + ":item/gun_127mm_type89_1.obj");
+
+        public static final ModelResourceLocation MRL_ITEM_ROUND_127MM_AAC = new ModelResourceLocation(HandheldNavalGun.MOD_ID + ":round_127mm_aac", "inventory");
+    }
+
+    @SideOnly(Side.CLIENT)
+    public static class TextureLocations
+    {
+        public static final ResourceLocation TEX_MOB_CREW = new ResourceLocation(HandheldNavalGun.MOD_ID, "entity/mob_crew");
+        public static final ResourceLocation TEX_MOB_CREW_MAIN_HAND = new ResourceLocation(HandheldNavalGun.MOD_ID, "entity/mob_crew_mh");
+        public static final ResourceLocation TEX_MOB_CREW_OFF_HAND = new ResourceLocation(HandheldNavalGun.MOD_ID, "entity/mob_crew_oh");
+    }
 
     @SideOnly(Side.CLIENT)
     public static void registerItemModels()
     {
         ModelLoader.setCustomModelResourceLocation(
                 HandheldNavalGun.ITEMS.GUN_127MM_TYPE89_SINGLE, 0,
-                HandheldNavalGun.ModelLocations.MRL_ITEM_GUN_127MM_TYPE89_SINGLE);
+                HandheldNavalGunClientRegistry.ModelLocations.MRL_ITEM_GUN_127MM_TYPE89_SINGLE);
         ModelLoader.setCustomModelResourceLocation(
                 HandheldNavalGun.ITEMS.ROUND_127MM_AAC, 0,
-                HandheldNavalGun.ModelLocations.MRL_ITEM_ROUND_127MM_AAC);
+                HandheldNavalGunClientRegistry.ModelLocations.MRL_ITEM_ROUND_127MM_AAC);
     }
 
     @SideOnly(Side.CLIENT)
     public static void registerRenderers()
     {
-        ForgeHooksClient.registerTESRItemStack(
-                HandheldNavalGun.ITEMS.GUN_127MM_TYPE89_SINGLE, 0,
-                TileEntityItemGun127mmType89Single.class);
-        ClientRegistry.bindTileEntitySpecialRenderer(
-                TileEntityItemGun127mmType89Single.class,
-                new RenderItemGun127mmType89Single());
+        ForgeHooksClient.registerTESRItemStack(HandheldNavalGun.ITEMS.GUN_127MM_TYPE89_SINGLE, 0, TileEntityItemGun127mmType89Single.class);
+        ClientRegistry.bindTileEntitySpecialRenderer(TileEntityItemGun127mmType89Single.class, new RenderItemGun127mmType89Single());
 
         RenderingRegistry.registerEntityRenderingHandler(
                 EntityProjectile127mmAntiAircraftCommon.class,
-                renderManager -> new RenderEntityProjectile127mmAntiAircraftCommon<>(
-                        renderManager));
+                renderManager -> new RenderEntityProjectile127mmAntiAircraftCommon<>(renderManager));
     }
 
     @SideOnly(Side.CLIENT)
     public static void registerSprites(TextureStitchEvent.Pre event)
     {
         event.getMap()
-                .registerSprite(HandheldNavalGun.TextureLocations.TEX_MOB_CREW);
-        event.getMap().registerSprite(
-                HandheldNavalGun.TextureLocations.TEX_MOB_CREW_MAIN_HAND);
-        event.getMap().registerSprite(
-                HandheldNavalGun.TextureLocations.TEX_MOB_CREW_OFF_HAND);
+                .registerSprite(HandheldNavalGunClientRegistry.TextureLocations.TEX_MOB_CREW);
+        event.getMap().registerSprite(HandheldNavalGunClientRegistry.TextureLocations.TEX_MOB_CREW_MAIN_HAND);
+        event.getMap().registerSprite(HandheldNavalGunClientRegistry.TextureLocations.TEX_MOB_CREW_OFF_HAND);
     }
 
     @SideOnly(Side.CLIENT)
     public static void registerBakedModels(ModelBakeEvent event)
     {
-        IBakedModel modelItem = event.getModelRegistry().getObject(
-                HandheldNavalGun.ModelLocations.MRL_ITEM_GUN_127MM_TYPE89_SINGLE);
+        IBakedModel modelItem = event.getModelRegistry().getObject(HandheldNavalGunClientRegistry.ModelLocations.MRL_ITEM_GUN_127MM_TYPE89_SINGLE);
         OBJBakedModel modelOBJ = null;
 
         try
         {
-            IModel model = ModelLoaderRegistry.getModel(
-                    HandheldNavalGun.ModelLocations.RL_OBJ_ITEM_GUN_127MM_TYPE89_SINGLE);
+            IModel model = ModelLoaderRegistry.getModel(HandheldNavalGunClientRegistry.ModelLocations.RL_OBJ_ITEM_GUN_127MM_TYPE89_SINGLE);
+
             HandheldNavalGun.INSTANCE.modelGunPartMainHand.registerModel(
-                    (OBJModel) ((OBJModel) model).retexture(ImmutableMap.of(
-                            "#" + HandheldNavalGun.TextureLocations.TEX_MOB_CREW
-                                    .toString(),
-                            HandheldNavalGun.TextureLocations.TEX_MOB_CREW_MAIN_HAND
-                                    .toString())));
+                    (OBJModel) ((OBJModel) model).retexture(ImmutableMap.of("#" + HandheldNavalGunClientRegistry.TextureLocations.TEX_MOB_CREW.toString(), HandheldNavalGunClientRegistry.TextureLocations.TEX_MOB_CREW_MAIN_HAND.toString())));
             HandheldNavalGun.INSTANCE.modelGunPartOffHand.registerModel(
-                    (OBJModel) ((OBJModel) model).retexture(ImmutableMap.of(
-                            "#" + HandheldNavalGun.TextureLocations.TEX_MOB_CREW
-                                    .toString(),
-                            HandheldNavalGun.TextureLocations.TEX_MOB_CREW_OFF_HAND
-                                    .toString())));
-            Function<ResourceLocation, TextureAtlasSprite> spriteGetter = resource -> Minecraft
-                    .getMinecraft().getTextureMapBlocks()
-                    .getAtlasSprite(resource.toString());
-            modelOBJ = (OBJBakedModel) model.bake(model.getDefaultState(),
-                    DefaultVertexFormats.ITEM, spriteGetter);
+                    (OBJModel) ((OBJModel) model).retexture(ImmutableMap.of("#" + HandheldNavalGunClientRegistry.TextureLocations.TEX_MOB_CREW.toString(), HandheldNavalGunClientRegistry.TextureLocations.TEX_MOB_CREW_OFF_HAND.toString())));
+
+            Function<ResourceLocation, TextureAtlasSprite> spriteGetter = resource -> Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(resource.toString());
+            modelOBJ = (OBJBakedModel) model.bake(model.getDefaultState(), DefaultVertexFormats.ITEM, spriteGetter);
         }
         catch (Exception e)
         {
@@ -104,9 +105,7 @@ public class HandheldNavalGunClientRegistry
 
         if (modelItem != null && modelOBJ != null)
         {
-            event.getModelRegistry().putObject(
-                    HandheldNavalGun.ModelLocations.MRL_ITEM_GUN_127MM_TYPE89_SINGLE,
-                    new ModelBakedItemOBJ(modelItem, modelOBJ));
+            event.getModelRegistry().putObject(HandheldNavalGunClientRegistry.ModelLocations.MRL_ITEM_GUN_127MM_TYPE89_SINGLE, new ModelBakedItemOBJ(modelItem, modelOBJ));
         }
     }
 
