@@ -4,11 +4,14 @@ import org.lwjgl.opengl.GL11;
 
 import iunius118.mods.handheldnavalgun.HandheldNavalGun;
 import iunius118.mods.handheldnavalgun.client.gunfirecontrolsystem.GunFireControlSystemGun127mmType89;
+import iunius118.mods.handheldnavalgun.item.ItemGun127mmType89Single;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.item.Item;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.ModelBakeEvent;
@@ -69,6 +72,18 @@ public class ClientEventHandler
 
         if (event.getType() == ElementType.HOTBAR && mc.getRenderManager().getFontRenderer() != null && mc.getRenderManager().options.thirdPersonView < 1)
         {
+            Item itemMainHand = null;
+
+            if(mc.thePlayer.getHeldItem(EnumHand.MAIN_HAND) != null)
+            {
+                itemMainHand = mc.thePlayer.getHeldItem(EnumHand.MAIN_HAND).getItem();
+            }
+
+            if(!(itemMainHand instanceof ItemGun127mmType89Single))
+            {
+                return;
+            }
+
             GunFireControlSystemGun127mmType89 gfcs = HandheldNavalGun.INSTANCE.gunFireControlSystem;
 
             Vec3d vec3Target = gfcs.indicator.getTargetScreenPos();
