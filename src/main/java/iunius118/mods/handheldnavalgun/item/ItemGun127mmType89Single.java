@@ -198,6 +198,7 @@ public class ItemGun127mmType89Single extends Item
                         }
 
                         entity.setFuseSafety(fuse.intValue());
+                        entity.setHeadingFromThrower(playerIn, playerIn.rotationPitch, playerIn.rotationYaw, 0.0F, EntityProjectile127mmAntiAircraftCommon.INITIAL_VELOCITY, EntityProjectile127mmAntiAircraftCommon.INACCURACY);
                         world.spawnEntityInWorld(entity);
                     }
                 }

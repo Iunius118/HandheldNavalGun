@@ -25,14 +25,15 @@ public class EntityProjectile127mmAntiAircraftCommon extends EntityThrowable
 
     public static final int FUSE_SAFETY = 2;
     public static final int FUSE_MAX = 80;
-    public int fuse = FUSE_MAX;
     public static final float STRENGTH = 4.0F;
     public static final float INITIAL_VELOCITY = 4.0F;
     public static final float INACCURACY = 1.0F;
 
     public static final String TAG_FUSE = "fuse";
-    public static final String TAG_TICKS_EXISTED = "age";
+    public static final String TAG_TICKS_AGE = "age";
 
+    public int fuse = FUSE_MAX;
+    public int ticksAge = 0;
     public float spin = 0.0F;
 
     public EntityProjectile127mmAntiAircraftCommon(World worldIn, EntityLivingBase throwerIn, int fuseTicks)
@@ -45,7 +46,6 @@ public class EntityProjectile127mmAntiAircraftCommon extends EntityThrowable
     {
         super(worldIn, throwerIn);
         this.ignoreEntity = throwerIn;
-        this.setHeadingFromThrower(throwerIn, throwerIn.rotationPitch, throwerIn.rotationYaw, 0.0F, this.INITIAL_VELOCITY, this.INACCURACY);
     }
 
     public EntityProjectile127mmAntiAircraftCommon(World worldIn)
@@ -102,18 +102,14 @@ public class EntityProjectile127mmAntiAircraftCommon extends EntityThrowable
 
     public void printDebugLog()
     {
-        if (!this.worldObj.isRemote)
-        {
-
-            System.out.println(
-                    "T: " + this.ticksExisted
-                    + ", F: " + this.fuse
-                    + ", Px: " + this.posX
-                    + ", Py: " + this.posY
-                    + ", Pz: " + this.posZ
-                    + ", Vy: " + this.motionY
-                    + ", V: " + Math.sqrt(this.motionX * this.motionX + this.motionY * this.motionY + this.motionZ * this.motionZ));
-        }
+        System.out.println(
+                "T: " + this.ticksAge
+                + ", F: " + this.fuse
+                + ", Px: " + this.posX
+                + ", Py: " + this.posY
+                + ", Pz: " + this.posZ
+                + ", Vy: " + this.motionY
+                + ", V: " + Math.sqrt(this.motionX * this.motionX + this.motionY * this.motionY + this.motionZ * this.motionZ));
     }
 
     @Override
@@ -121,11 +117,11 @@ public class EntityProjectile127mmAntiAircraftCommon extends EntityThrowable
     {
         super.onUpdate();
 
-        this.fuse--;
-        // this.printDebugLog();
+        ++this.ticksAge;
+        --this.fuse;
+        // if (!this.worldObj.isRemote) this.printDebugLog();
 
-        if (!this.isDead
-                && (this.fuse < 1 || this.isInWater() || this.isInLava()))
+        if (!this.isDead && (this.fuse < 1 || this.isInWater() || this.isInLava()))
         {
             this.onImpact(new RayTraceResult(this));
         }
@@ -146,7 +142,7 @@ public class EntityProjectile127mmAntiAircraftCommon extends EntityThrowable
             // Server
             WorldServer world = (WorldServer) this.worldObj;
 
-            if (this.ticksExisted > this.FUSE_SAFETY)
+            if (this.ticksAge > this.FUSE_SAFETY)
             {
                 // create explosion
                 world.spawnParticle(EnumParticleTypes.EXPLOSION_HUGE, true, result.hitVec.xCoord, result.hitVec.yCoord, result.hitVec.zCoord, 1, 0.0D, 0.0D, 0.0D, 0.0D, new int[0]);
@@ -225,7 +221,7 @@ public class EntityProjectile127mmAntiAircraftCommon extends EntityThrowable
     {
         super.writeEntityToNBT(compound);
         compound.setInteger(this.TAG_FUSE, this.fuse);
-        compound.setInteger(this.TAG_TICKS_EXISTED, this.ticksExisted);
+        compound.setInteger(this.TAG_TICKS_AGE, this.ticksAge);
     }
 
     @Override
@@ -233,7 +229,7 @@ public class EntityProjectile127mmAntiAircraftCommon extends EntityThrowable
     {
         super.readEntityFromNBT(compound);
         this.setFuse(compound.getInteger(this.TAG_FUSE));
-        this.ticksExisted = compound.getInteger(this.TAG_TICKS_EXISTED);
+        this.ticksAge = compound.getInteger(this.TAG_TICKS_AGE);
     }
 
     @Override
