@@ -1,6 +1,6 @@
 
 
-	HandheldNavalGun 0.1.0
+	HandheldNavalGun 1.10.2-0.1.0
 
 
 ・このmodについて
@@ -101,7 +101,7 @@
 
 ・謝辞
 
-	当modの一部モデルとテクスチャはMMM氏の littleMaidMob を参考に作られました。
+	当modの一部モデルとテクスチャはMMM氏の littleMaidMob を参考に作られました。厚く御礼申し上げます。
 	（なお、当mod自体は MMM氏 および littleMaidMob とは一切関係ありません）
 
 
