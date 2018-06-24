@@ -22,7 +22,6 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
@@ -65,10 +64,6 @@ public class HandheldNavalGun
 
     @SideOnly(Side.CLIENT)
     public GunFireControlSystemGun127mmType89 gunFireControlSystem;
-    @SideOnly(Side.CLIENT)
-    public Vec3d vec3Target;
-    @SideOnly(Side.CLIENT)
-    public Vec3d vec3Marker;
     @SideOnly(Side.CLIENT)
     public ModelItemGun127mmType89Single modelGunPartMainHand;
     @SideOnly(Side.CLIENT)
@@ -226,7 +221,7 @@ public class HandheldNavalGun
                 EntityProjectile127mmAntiAircraftCommon.class,
                 "entity_projectile_127mm_anti_aircraft_common",
                 EntityID.PROJECTILE_127MM_ANTI_AIRCRAFT_COMMON.ordinal(),
-                HandheldNavalGun.INSTANCE, 256, 5, true);
+                HandheldNavalGun.INSTANCE, 256, 40, true);
     }
 
 }
