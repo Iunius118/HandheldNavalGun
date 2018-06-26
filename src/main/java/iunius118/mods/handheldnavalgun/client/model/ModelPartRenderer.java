@@ -9,21 +9,18 @@ import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
 import org.lwjgl.opengl.GL11;
 
-import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.UnmodifiableIterator;
 
 import iunius118.mods.handheldnavalgun.client.renderer.RenderItemGun127mmType89Single.RenderContext;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.Vec3d;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.obj.OBJModel;
 import net.minecraftforge.client.model.pipeline.LightUtil;
 import net.minecraftforge.common.model.IModelState;
@@ -81,8 +78,6 @@ public class ModelPartRenderer
 
         try
         {
-            Function<ResourceLocation, TextureAtlasSprite> spriteGetter = resource -> Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(resource.toString());
-
             // ModelState for handling visibility of each group.
             IModelState modelState = part -> {
                 if (part.isPresent())
@@ -110,7 +105,7 @@ public class ModelPartRenderer
             };
 
             // Bake model of visible groups.
-            IBakedModel bakedModel = obj.bake(modelState, DefaultVertexFormats.ITEM, spriteGetter);
+            IBakedModel bakedModel = obj.bake(modelState, DefaultVertexFormats.ITEM, ModelLoader.defaultTextureGetter());
 
             quads = bakedModel.getQuads(null, null, 0);
         }
