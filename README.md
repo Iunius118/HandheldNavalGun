@@ -9,4 +9,4 @@ Releasesページの**Assets**にある **HandheldNavalGun-(Minecraftバージ�
 
 - [Releases (from GitHub)](https://github.com/Iunius118/HandheldNavalGun/releases)
 
-Copyright 2018 Iunius118
+Copyright 2016-2018 Iunius118
